@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Executa o Biome para verificar e aplicar correções seguras
+npx @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true

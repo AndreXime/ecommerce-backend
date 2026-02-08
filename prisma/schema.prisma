@@ -1,0 +1,10 @@
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["fullTextSearchPostgres"]
+  binaryTargets   = ["native", "debian-openssl-1.1.x"]
+  output          = "../src/database/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}

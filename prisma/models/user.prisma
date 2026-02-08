@@ -1,0 +1,51 @@
+model User {
+  id           String  @id @unique @default(uuid(7)) @db.Uuid
+  email        String  @unique
+  password     String
+  name         String
+
+  role      Roles   @default(CUSTOMER)
+
+  notifications UserNotification[]
+  refreshTokens RefreshToken[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("users")
+}
+
+enum Roles {
+  ADMIN
+  CUSTOMER
+  SUPPORT
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  hashedToken String   @unique // Armazenamos o hash, não o token puro
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revoked   Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@map("refresh_tokens")
+}
+
+model UserNotification {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  message   String
+  read      Boolean  @default(false)
+  link      String?
+  
+  createdAt DateTime @default(now()) @map("created_at")
+
+  userId String   @db.Uuid
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
+
+  @@index([userId])
+  @@map("notifications")
+}
+
