@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-const SchemaPassword = z.string("PASSWORD must be a string").min(6, "PASSWORD must be at least 6 characters");
-const SchemaName = z.string("NAME must be a string").min(1, "NAME must be at least 1 character");
-const SchemaEmail = z.email("EMAIL must be a valid email").toLowerCase();
+const SchemaPassword = z.string("Senha deve ser string").min(6, "Senha deve ter no minimo 6 caracteres");
+const SchemaName = z.string("Nome deve ser string").min(1, "NAME must be at least 1 character");
+const SchemaEmail = z.email("Email deve ser um email valido").toLowerCase();
 
 export { SchemaPassword, SchemaEmail, SchemaName };

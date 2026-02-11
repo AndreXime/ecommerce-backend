@@ -11,7 +11,7 @@ async function signIn({ email, password }: UserSignIn) {
 		},
 	});
 
-	const isPasswordValid = await verifyPassword(password, user.password);
+	const isPasswordValid = await verifyPassword(password, user?.password || "");
 
 	if (!user || !isPasswordValid) {
 		throw new HTTPException(401, { message: "Email ou senha inválidos" });
