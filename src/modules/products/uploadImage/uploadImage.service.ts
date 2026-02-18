@@ -10,7 +10,8 @@ export async function generateProductImageUpload(productId: string, body: Body) 
 	await database.product.findUniqueOrThrow({ where: { id: productId } });
 
 	const ext = body.contentType.split("/")[1];
-	const fileKey = `products/${productId}/${randomUUID()}.${ext}`;
+	const date = new Date().toISOString().slice(0, 19).replace("T", "-").replace(/:/g, "-");
+	const fileKey = `products/${productId}/${date}-${randomUUID()}.${ext}`;
 	const publicUrl = storage.getPublicUrl(fileKey);
 
 	const [image, { uploadUrl }] = await Promise.all([
@@ -22,7 +23,7 @@ export async function generateProductImageUpload(productId: string, body: Body) 
 				position: body.position,
 			},
 		}),
-		storage.getUploadUrl(body.contentType, fileKey),
+		storage.getUploadUrl({ fileType: body.contentType, fileKey, cacheControl: "public, max-age=31536000, immutable" }),
 	]);
 
 	return {
