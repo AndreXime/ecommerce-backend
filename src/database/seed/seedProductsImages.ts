@@ -62,7 +62,10 @@ export async function generateSeedProductImages(
 	const result: Record<string, SeedImage[]> = {};
 	const useMagick = hasMagick();
 
+	console.log(`[imagens] usando ${useMagick ? "magick + S3" : "placehold.co (magick não encontrado)"}`);
+
 	for (const product of products) {
+		console.log(`[imagens] gerando imagens de "${product.tag}"...`);
 		result[product.tag] = await Promise.all(
 			product.images.map((img) =>
 				useMagick

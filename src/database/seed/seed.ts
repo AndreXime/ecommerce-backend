@@ -120,24 +120,31 @@ async function seedUsers(tx: Prisma.TransactionClient) {
 }
 
 async function seed() {
+	console.log("[seed] iniciando...");
 	try {
 		await database.$transaction(
 			async (tx) => {
 				const userCount = await tx.user.count();
 				if (userCount > 0) {
+					console.log("[seed] banco já populado, abortando.");
 					return;
 				}
 
+				console.log("[seed] criando usuários...");
 				const users = await seedUsers(tx);
+
+				console.log("[seed] criando categorias...");
 				const categories = await seedCategories(tx);
+
+				console.log("[seed] criando produtos...");
 				await seedProducts(
 					tx,
 					categories.map((c) => c.id),
 				);
 
-				// Endereço para o primeiro usuário customer
 				const customer = users.find((u) => u.role === "CUSTOMER");
 				if (customer) {
+					console.log(`[seed] criando endereço e cartão para "${customer.name}"...`);
 					await tx.address.create({
 						data: {
 							userId: customer.id,
@@ -157,6 +164,8 @@ async function seed() {
 						},
 					});
 				}
+
+				console.log("[seed] concluído com sucesso.");
 			},
 			{ maxWait: 5000, timeout: 300000 },
 		);
