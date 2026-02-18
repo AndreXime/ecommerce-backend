@@ -162,6 +162,11 @@ class StorageProvider {
 		}
 	}
 
+	/** URL pública sem autenticação — funciona quando o bucket tem leitura pública */
+	getPublicUrl(fileKey: string) {
+		return `${environment.S3_ENDPOINT_URL}/${environment.S3_BUCKET}/${fileKey}`;
+	}
+
 	async testConnection(): Promise<boolean> {
 		try {
 			await this.client.send(new ListBucketsCommand({}));

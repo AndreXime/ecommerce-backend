@@ -4,7 +4,9 @@ import { registerRoutesProductCreate } from "./create/create.controller";
 import { registerRoutesProductGet } from "./get/get.controller";
 import { registerRoutesProductList } from "./list/list.controller";
 import { registerRoutesProductRemove } from "./remove/remove.controller";
+import { registerRoutesProductRemoveImage } from "./removeImage/removeImage.controller";
 import { registerRoutesProductUpdate } from "./update/update.controller";
+import { registerRoutesProductUploadImage } from "./uploadImage/uploadImage.controller";
 
 export const createProductsRoutes = () => {
 	const app = createRouter();
@@ -15,6 +17,8 @@ export const createProductsRoutes = () => {
 	registerRoutesProductUpdate(app);
 	registerRoutesProductRemove(app);
 	registerRoutesProductAddReview(app);
+	registerRoutesProductUploadImage(app);
+	registerRoutesProductRemoveImage(app);
 
 	return app;
 };
