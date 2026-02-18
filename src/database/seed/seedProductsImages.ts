@@ -23,9 +23,9 @@ function placeholdUrl(def: ImageDef): string {
 	return `https://placehold.co/600x600/${bg}/${text}/png?text=${label}`;
 }
 
-async function generateAndUpload(def: ImageDef, productTag: string): Promise<SeedImage> {
+async function generateAndUpload(def: ImageDef, productTag: string, date: string): Promise<SeedImage> {
 	const tmpPath = `/tmp/seed-${productTag}-${def.position}-${randomUUID()}.png`;
-	const fileKey = `products/seed/${productTag}-${def.position}.png`;
+	const fileKey = `products/seed/${productTag}-${def.position}-${date}.png`;
 
 	const proc = Bun.spawnSync([
 		"magick",
@@ -50,7 +50,12 @@ async function generateAndUpload(def: ImageDef, productTag: string): Promise<See
 	}
 
 	const buffer = Buffer.from(await Bun.file(tmpPath).arrayBuffer());
-	await storage.uploadFile(buffer, "image/png", fileKey);
+	await storage.uploadFile({
+		data: buffer,
+		fileType: "image/png",
+		fileKey,
+		cacheControl: "public, max-age=31536000, immutable",
+	});
 	await unlink(tmpPath);
 
 	return { url: storage.getPublicUrl(fileKey), position: def.position };
@@ -61,6 +66,7 @@ export async function generateSeedProductImages(
 ): Promise<Record<string, SeedImage[]>> {
 	const result: Record<string, SeedImage[]> = {};
 	const useMagick = hasMagick();
+	const date = new Date().toISOString().slice(0, 19).replace("T", "-").replace(/:/g, "-");
 
 	console.log(`[imagens] usando ${useMagick ? "magick + S3" : "placehold.co (magick não encontrado)"}`);
 
@@ -69,7 +75,7 @@ export async function generateSeedProductImages(
 		result[product.tag] = await Promise.all(
 			product.images.map((img) =>
 				useMagick
-					? generateAndUpload(img, product.tag)
+					? generateAndUpload(img, product.tag, date)
 					: Promise.resolve({ url: placeholdUrl(img), position: img.position }),
 			),
 		);
