@@ -26,7 +26,7 @@ API REST completa para uma aplicação de ecommerce, desenvolvida com **Bun** e 
 - **Rate Limiting:** global (100 req/15min) e específico para rotas de auth (10 req/15min), via Redis.
 - **S3:** upload e download com URLs pré-assinadas (simulado com LocalStack em dev).
 - **Filas e Email:** processamento assíncrono com BullMQ + Nodemailer.
-- **Documentação:** OpenAPI 3.0 gerada automaticamente com Scalar UI.
+- **Documentação:** OpenAPI 3.0 gerada automaticamente com Scalar UI em `/docs`.
 
 ---
 
@@ -53,6 +53,24 @@ API REST completa para uma aplicação de ecommerce, desenvolvida com **Bun** e 
 cp .env.example .env
 ```
 
+| Variável | Descrição | Exemplo |
+|---|---|---|
+| `ENV` | Modo de execução | `DEV` |
+| `PORT` | Porta da API | `8080` |
+| `FRONTEND_URL` | Origem permitida pelo CORS | `http://localhost:3000` |
+| `DATABASE_URL` | Connection string do PostgreSQL | `postgresql://user:pass@localhost:5432/db` |
+| `REDIS_URL` | URL do Redis | `redis://localhost:6379` |
+| `JWT_SECRET` | Chave secreta para assinar JWTs | string base64 de 32 bytes |
+| `JWT_ACCESS_EXPIRATION` | Expiração do access token | `15m` |
+| `JWT_REFRESH_EXPIRATION` | Expiração do refresh token | `1d` |
+| `S3_ENDPOINT_URL` | Endpoint do S3 (LocalStack em dev) | `http://127.0.0.1:4566` |
+| `S3_ACCESS_KEY` | Chave de acesso S3 | `test` |
+| `S3_SECRET_KEY` | Chave secreta S3 | `test` |
+| `S3_REGION` | Região S3 | `us-east-1` |
+| `S3_BUCKET` | Nome do bucket | `files` |
+| `EMAIL_SERVICE_HOST` | Host do servidor SMTP | `localhost` |
+| `EMAIL_SERVICE_PORT` | Porta do servidor SMTP | `1025` |
+
 ### 2. Subir serviços (PostgreSQL, Redis, LocalStack, Mailpit)
 
 ```bash
@@ -72,7 +90,15 @@ bunx prisma migrate dev
 bunx prisma db seed
 ```
 
-O seed cria um usuário `ADMIN`, dois `CUSTOMER`s, categorias e produtos de exemplo.
+O seed cria os seguintes dados de exemplo:
+
+| Usuário | Senha | Cargo |
+|---|---|---|
+| `admin@example.com` | `123456` | ADMIN |
+| `user@example.com` | `123456` | CUSTOMER |
+| `user2@example.com` | `123456` | CUSTOMER |
+
+Além de 5 categorias, 4 produtos com imagens e opções selecionáveis, e um endereço + cartão para o primeiro customer.
 
 ### 5. Iniciar em desenvolvimento
 
@@ -119,7 +145,7 @@ API disponível em `http://localhost:8080` · Documentação em `http://localhos
 | DELETE | `/products/:id` | ADMIN | Remove produto |
 | POST | `/products/:id/reviews` | Auth | Adiciona avaliação |
 
-**Query params de `/products`:** `page`, `limit`, `sortBy`, `sortOrder`, `search`, `category`, `minPrice`, `maxPrice`, `inStock`.
+**Query params de `/products`:** `page`, `limit`, `sortBy` (`name` \| `price` \| `rating` \| `createdAt`), `sortOrder` (`asc` \| `desc`), `search`, `category`, `minPrice`, `maxPrice`, `inStock`.
 
 ### Categorias — `/categories`
 
@@ -149,8 +175,8 @@ API disponível em `http://localhost:8080` · Documentação em `http://localhos
 |---|---|---|---|
 | GET | `/orders` | Auth | Lista pedidos (usuário vê os seus; ADMIN vê todos) |
 | GET | `/orders/:id` | Auth | Detalhes do pedido |
-| POST | `/orders` | Auth | Cria pedido a partir do carrinho |
-| PATCH | `/orders/:id/status` | ADMIN | Atualiza status (`delivered`, `intransit`, `cancelled`) |
+| POST | `/orders` | Auth | Cria pedido a partir do carrinho ou de itens explícitos |
+| PATCH | `/orders/:id/status` | ADMIN | Atualiza status (`delivered` \| `intransit` \| `cancelled`) |
 
 ---
 
