@@ -6,6 +6,7 @@
 		"build": "bun build src/index.ts --compile --outfile serve",
 		"check": "biome check . && tsc --noEmit",
 		"format": "biome check --write --no-errors-on-unmatched .",
+		"seed": "bun run src/database/seed/seed.ts",
 		"prepare": "husky"
 	},
 	"dependencies": {
