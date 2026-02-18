@@ -1,0 +1,13 @@
+# deps
+node_modules/
+
+# environment variable
+.env
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# prisma client
+src/database/client

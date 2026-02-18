@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"strict": true,
+		"lib": ["ESNext", "DOM", "DOM.Iterable"],
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleDetection": "force",
+		"allowJs": false,
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
+		"noEmit": true,
+		"skipLibCheck": true,
+
+		"types": ["bun"],
+		"paths": {
+			"@/*": ["./src/*"],
+			"prisma": ["./src/database/client/client"]
+		}
+	},
+	"exclude": ["node_modules", ".husky", ".vscode", "prisma"]
+}

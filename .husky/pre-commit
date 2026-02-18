@@ -1,0 +1,8 @@
+# Tenta formatar e aplicar correções seguras automaticamente
+bun run format
+
+# Adiciona APENAS os arquivos que já estavam no stage anteriormente
+git diff --name-only --cached --diff-filter=d | xargs -r git add
+
+# Verifica se ainda restam erros de lint ou formatação que não puderam ser corrigidos
+bun run check
