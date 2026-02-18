@@ -1,6 +1,7 @@
 import { hashPassword } from "@/modules/auth/shared/hash";
 import type { Prisma } from "../client/client";
 import { database } from "../database";
+import { generateSeedProductImages, type ImageDef } from "./seedProductsImages";
 
 async function seedCategories(tx: Prisma.TransactionClient) {
 	const categories = ["Eletrônicos", "Roupas", "Calçados", "Casa & Decoração", "Esportes"];
@@ -25,9 +26,9 @@ async function seedProducts(tx: Prisma.TransactionClient, categoryIds: string[])
 			specs: { Autonomia: "30h", Conectividade: "Bluetooth 5.3", Peso: "250g" },
 			categoryId: eletronicos,
 			images: [
-				{ url: "https://placehold.co/600x600?text=Fone+1", position: 0 },
-				{ url: "https://placehold.co/600x600?text=Fone+2", position: 1 },
-			],
+				{ label: "Fone Bluetooth Pro", bg: "#1e1e2e", textColor: "#89b4fa", position: 0 },
+				{ label: "Vista Traseira", bg: "#181825", textColor: "#cba6f7", position: 1 },
+			] satisfies ImageDef[],
 			options: [{ label: "Cor", uiType: "color" as const, values: ["bg-black", "bg-white", "bg-blue-600"] }],
 		},
 		{
@@ -39,7 +40,7 @@ async function seedProducts(tx: Prisma.TransactionClient, categoryIds: string[])
 			description: "Smartwatch com monitoramento de saúde avançado, GPS integrado e tela AMOLED.",
 			specs: { Tela: 'AMOLED 1.9"', GPS: "Sim", Resistência: "IP68", Bateria: "7 dias" },
 			categoryId: eletronicos,
-			images: [{ url: "https://placehold.co/600x600?text=Watch+1", position: 0 }],
+			images: [{ label: "Smartwatch Ultra", bg: "#24273a", textColor: "#f5a97f", position: 0 }] satisfies ImageDef[],
 			options: [{ label: "Cor", uiType: "color" as const, values: ["bg-gray-800", "bg-yellow-500"] }],
 		},
 		{
@@ -51,7 +52,7 @@ async function seedProducts(tx: Prisma.TransactionClient, categoryIds: string[])
 			description: "Camiseta 100% algodão premium, corte moderno e confortável.",
 			specs: { Material: "100% Algodão", Lavagem: "Máquina" },
 			categoryId: roupas,
-			images: [{ url: "https://placehold.co/600x600?text=Camiseta", position: 0 }],
+			images: [{ label: "Camiseta Premium", bg: "#eff1f5", textColor: "#4c4f69", position: 0 }] satisfies ImageDef[],
 			options: [
 				{ label: "Tamanho", uiType: "pill" as const, values: ["P", "M", "G", "GG"] },
 				{ label: "Cor", uiType: "color" as const, values: ["bg-white", "bg-black", "bg-blue-500"] },
@@ -66,7 +67,7 @@ async function seedProducts(tx: Prisma.TransactionClient, categoryIds: string[])
 			description: "Tênis de corrida com amortecimento avançado e solado antiderrapante.",
 			specs: { Solado: "Borracha antiderrapante", Cabedal: "Mesh respirável", Drop: "8mm" },
 			categoryId: calcados,
-			images: [{ url: "https://placehold.co/600x600?text=Tenis", position: 0 }],
+			images: [{ label: "Runner 360", bg: "#11111b", textColor: "#f38ba8", position: 0 }] satisfies ImageDef[],
 			options: [
 				{ label: "Numeração", uiType: "pill" as const, values: ["38", "39", "40", "41", "42", "43"] },
 				{ label: "Cor", uiType: "color" as const, values: ["bg-red-500", "bg-black", "bg-white"] },
@@ -74,13 +75,15 @@ async function seedProducts(tx: Prisma.TransactionClient, categoryIds: string[])
 		},
 	];
 
+	const productImages = await generateSeedProductImages(products);
+
 	for (const p of products) {
-		const { images, options, specs, ...data } = p;
+		const { images: _, options, specs, ...data } = p;
 		await tx.product.create({
 			data: {
 				...data,
 				specs,
-				images: { create: images },
+				images: { create: productImages[p.tag] },
 				options: { create: options },
 			},
 		});
