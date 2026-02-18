@@ -1,122 +1,196 @@
-# Bun Hono Ecommerce Template
+# Ecommerce Backend
 
-Uma **API Template** de alto desempenho, desenvolvida com **Bun** e **Hono**. Este projeto serve como um "starter kit" completo para aplicações modernas, trazendo uma arquitetura sólida e pré-configurada com as melhores práticas de mercado.
-
-O objetivo é fornecer uma fundação segura e escalável, integrando nativamente autenticação avançada, gestão de ficheiros, filas de processamento e base de dados, poupando semanas de configuração inicial.
+API REST completa para uma aplicação de ecommerce, desenvolvida com **Bun** e **Hono**. Cobre todo o ciclo de compra: catálogo de produtos, carrinho, wishlist, pedidos e perfil do usuário — com autenticação segura, documentação OpenAPI e infraestrutura pronta para produção.
 
 ---
 
-## Funcionalidades Principais
+## Funcionalidades
 
 ### Autenticação e Segurança
-O sistema utiliza uma estratégia híbrida e segura para gestão de sessões:
-* **Dual Token System (JWT):** Utiliza *Access Tokens* (curta duração) e *Refresh Tokens* (longa duração) geridos via Cookies `HttpOnly` e `Secure`.
-* **Gestão de Estado de Tokens:**
-    * **Refresh Tokens no PostgreSQL:** Armazenados na base de dados para permitir a invalidação de sessões e verificar a legitimidade ao solicitar novos tokens de acesso.
-    * **Access Tokens no Redis (Blocklist):** Implementação de uma *Blocklist* para gestão de **Logout**. Quando um utilizador termina a sessão, o JTI (ID do token) é revogado no Redis até à sua expiração natural, eliminando a brecha de segurança onde um cookie ainda poderia ser válido após o logout.
-* **RBAC (Role-Based Access Control):** Middleware de controlo de acesso baseado em cargos (`ADMIN`, `CUSTOMER`, `SUPPORT`).
-* **Proteção CSRF:** Integrada nativamente.
+- **Dual Token (JWT):** Access Tokens de curta duração + Refresh Tokens armazenados no PostgreSQL, ambos trafegados via cookies `HttpOnly` e `Secure`.
+- **Blocklist no Redis:** ao fazer logout, o JTI do Access Token é revogado no Redis até expirar naturalmente, eliminando a janela de uso indevido pós-logout.
+- **RBAC:** controle de acesso por cargo (`ADMIN`, `CUSTOMER`, `SUPPORT`).
+- **Proteção CSRF** integrada.
 
-### Middlewares e Validação
-O fluxo de requisição passa por uma cadeia estrita de verificações:
-1.  **Logger:** Registo detalhado de requisições e erros.
-2.  **Global Rate Limiter:** Proteção contra abuso geral (100 req/15min).
-3.  **Strict Auth Rate Limiter:** Proteção específica para rotas de autenticação (Login/Registo) para prevenir *brute-force* (10 req/15min).
-4.  **Validação Zod:** Todos os inputs (Body, Query, Params) são validados estritamente com schemas Zod antes de atingirem os controladores.
+### Ecommerce
+- **Produtos:** listagem paginada com filtros (categoria, preço, estoque, busca), detalhes completos com opções selecionáveis (cor, tamanho etc.) e avaliações. Rating recalculado automaticamente a cada nova review.
+- **Categorias:** listagem pública, criação restrita a ADMIN.
+- **Carrinho:** persistido no banco por usuário. Adiciona, acumula, atualiza variante e remove itens.
+- **Wishlist:** toggle — adiciona se não estiver, remove se já estiver.
+- **Pedidos:** criação a partir do carrinho ativo (limpa o carrinho e incrementa `quantitySold`), listagem com escopo por cargo, atualização de status (ADMIN).
+- **Perfil completo:** `GET /users/me` retorna `personalData`, `ordersHistory`, `wishlistProducts`, `paymentCards` e `addresses` — alinhado diretamente com a interface `User` do frontend.
+- **Endereços:** adicionar, atualizar e remover; garantia de unicidade do endereço padrão.
+- **Cartões de pagamento:** adicionar e remover.
 
-### Infraestrutura e Serviços Integrados
-* **Base de Dados:** PostgreSQL gerido via **Prisma ORM**.
-* **Cache & Performance:** Redis (via `ioredis`) utilizado para *Rate Limiting* e *Blocklist* de tokens.
-* **Armazenamento de Ficheiros (S3):** Integração com AWS S3 (simulado com **LocalStack** em desenvolvimento) para upload e download de ficheiros com URLs pré-assinados.
-* **Sistema de Filas e Email:** Processamento assíncrono com **BullMQ** (Redis) e envio de emails transacionais via **Nodemailer**.
-
-### 📚 Documentação
-* **OpenAPI 3.0:** Especificação completa da API gerada automaticamente.
-* **Scalar UI:** Interface interativa para testar e visualizar a documentação.
+### Infraestrutura
+- **Rate Limiting:** global (100 req/15min) e específico para rotas de auth (10 req/15min), via Redis.
+- **S3:** upload e download com URLs pré-assinadas (simulado com LocalStack em dev).
+- **Filas e Email:** processamento assíncrono com BullMQ + Nodemailer.
+- **Documentação:** OpenAPI 3.0 gerada automaticamente com Scalar UI.
 
 ---
 
-## 🛠️ Stack Tecnológica
+## Stack
 
-* **Runtime:** [Bun](https://bun.sh)
-* **Framework:** [Hono](https://hono.dev)
-* **Database:** PostgreSQL
-* **ORM:** Prisma
-* **Cache/Queue:** Redis
-* **Storage:** AWS S3 SDK
-* **Validation:** Zod & Hono Zod Validator
-* **Docs:** Scalar & Zod OpenAPI
-* **Tooling:** Biome (Linter/Formatter), Husky (Git Hooks)
+| Camada | Tecnologia |
+|---|---|
+| Runtime | [Bun](https://bun.sh) |
+| Framework | [Hono](https://hono.dev) |
+| Banco de dados | PostgreSQL + Prisma ORM |
+| Cache / Filas | Redis (ioredis + BullMQ) |
+| Storage | AWS S3 SDK |
+| Validação | Zod + Hono Zod OpenAPI |
+| Documentação | Scalar |
+| Qualidade | Biome (lint/format) + Husky |
 
 ---
 
-## 🚀 Como Iniciar o Projeto
+## Como rodar
 
-### 1. Configurar Variáveis de Ambiente
-
-Copie o arquivo `.env.example` para `.env`:
+### 1. Variáveis de ambiente
 
 ```bash
 cp .env.example .env
 ```
 
-### 2. Iniciar Serviços com Docker Compose
-
-Inicie todos os serviços necessários (PostgreSQL, Redis, LocalStack):
+### 2. Subir serviços (PostgreSQL, Redis, LocalStack, Mailpit)
 
 ```bash
 docker compose up -d
 ```
 
-### 3. Instalar Dependências
+### 3. Instalar dependências
 
 ```bash
 bun install
 ```
 
-### 4. Executar Migrações do Prisma
+### 4. Migração e seed
 
 ```bash
 bunx prisma migrate dev
+bunx prisma db seed
 ```
 
-### 5. Iniciar Servidor de Desenvolvimento
+O seed cria um usuário `ADMIN`, dois `CUSTOMER`s, categorias e produtos de exemplo.
+
+### 5. Iniciar em desenvolvimento
 
 ```bash
 bun dev
 ```
 
-A API estará disponível em `http://localhost:3000` e a documentação em `http://localhost:3000/docs`.
+API disponível em `http://localhost:8080` · Documentação em `http://localhost:8080/docs`
 
 ---
 
-## 📂 Estrutura do Projeto
+## Rotas
 
-```bash
+### Auth — `/auth`
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/auth/register` | Cadastro de usuário |
+| POST | `/auth/login` | Login; retorna access + refresh token |
+| POST | `/auth/refresh` | Renova o access token via refresh token |
+| POST | `/auth/logout` | Revoga a sessão |
+
+### Usuário — `/users`
+
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| GET | `/users` | ADMIN | Lista usuários com paginação |
+| GET | `/users/me` | Auth | Perfil completo do usuário autenticado |
+| PATCH | `/users/me` | Auth | Atualiza dados pessoais / senha |
+| POST | `/users/me/addresses` | Auth | Adiciona endereço |
+| PATCH | `/users/me/addresses/:addressId` | Auth | Atualiza endereço |
+| DELETE | `/users/me/addresses/:addressId` | Auth | Remove endereço |
+| POST | `/users/me/cards` | Auth | Adiciona cartão de pagamento |
+| DELETE | `/users/me/cards/:cardId` | Auth | Remove cartão |
+
+### Produtos — `/products`
+
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| GET | `/products` | Público | Listagem com filtros e paginação |
+| GET | `/products/:id` | Público | Detalhes + opções + reviews |
+| POST | `/products` | ADMIN | Cria produto |
+| PATCH | `/products/:id` | ADMIN | Atualiza produto |
+| DELETE | `/products/:id` | ADMIN | Remove produto |
+| POST | `/products/:id/reviews` | Auth | Adiciona avaliação |
+
+**Query params de `/products`:** `page`, `limit`, `sortBy`, `sortOrder`, `search`, `category`, `minPrice`, `maxPrice`, `inStock`.
+
+### Categorias — `/categories`
+
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| GET | `/categories` | Público | Lista todas as categorias |
+| POST | `/categories` | ADMIN | Cria categoria |
+
+### Carrinho — `/cart`
+
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| GET | `/cart` | Auth | Retorna o carrinho (criado automaticamente) |
+| POST | `/cart/items` | Auth | Adiciona item (acumula se já existir) |
+| PATCH | `/cart/items/:productId` | Auth | Atualiza quantidade / variante |
+| DELETE | `/cart/items/:productId` | Auth | Remove item |
+
+### Wishlist — `/wishlist`
+
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| POST | `/wishlist/:productId` | Auth | Toggle: adiciona ou remove o produto |
+
+### Pedidos — `/orders`
+
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| GET | `/orders` | Auth | Lista pedidos (usuário vê os seus; ADMIN vê todos) |
+| GET | `/orders/:id` | Auth | Detalhes do pedido |
+| POST | `/orders` | Auth | Cria pedido a partir do carrinho |
+| PATCH | `/orders/:id/status` | ADMIN | Atualiza status (`delivered`, `intransit`, `cancelled`) |
+
+---
+
+## Estrutura do Projeto
+
+```
 src/
-├── @types/          # Definições de tipos globais
-├── database/        # Cliente Prisma e Seeds
-├── lib/             # Configurações de clientes (S3, Redis, Env, Queue)
-├── middlewares/     # Camadas de processamento (Auth, Logs, Rate Limit, Zod)
-├── modules/         # Lógica de negócio modular
-│   ├── auth/        # Login, Registo, Refresh, Logout, Blocklist
-│   ├── user/        # Gestão de utilizadores e perfis
-│   └── shared/      # Utilitários partilhados (Schemas, Paginação)
-└── index.ts         # Ponto de entrada da aplicação
+├── @types/           # Tipos globais (AppBindings, JWT)
+├── database/
+│   ├── client/       # Cliente Prisma gerado
+│   ├── database.ts   # Singleton com retry e pool
+│   └── seed/         # Seed de desenvolvimento
+├── lib/              # Clientes externos (S3, Redis, BullMQ, env)
+├── middlewares/      # Auth, CORS, rate limiter, logger, erros
+└── modules/
+    ├── auth/         # login, register, refresh, logout
+    ├── cart/         # get, addItem, updateItem, removeItem
+    ├── categories/   # list, create
+    ├── orders/       # list, get, create, updateStatus
+    ├── products/     # list, get, create, update, remove, addReview
+    ├── user/         # me, readUser, update, addresses, cards
+    ├── wishlist/     # toggle
+    └── shared/       # schemas Zod, mappers, paginação
+
+prisma/
+├── models/           # Um arquivo .prisma por domínio
+└── migrations/
 ```
 
+Cada ação dentro de um módulo segue a estrutura de 5 arquivos: `schema`, `docs`, `controller`, `service`, `test`. Veja [PATTERNS.md](./PATTERNS.md) para detalhes.
+
 ---
 
-## 📚 Guias e Padrões
+## Guias
 
-Para garantir consistência e qualidade do código, consulte:
-
-* **[PATTERNS.md](./PATTERNS.md)** - Estrutura obrigatória dos 5 arquivos por ação, padrões de nomenclatura e reutilização de schemas
-* **[MIDDLEWARES.md](./MIDDLEWARES.md)** - Pipeline completo de processamento de requests e ordem de execução
+- **[PATTERNS.md](./PATTERNS.md)** — Estrutura de módulos, nomenclatura e reutilização de schemas
+- **[MIDDLEWARES.md](./MIDDLEWARES.md)** — Pipeline de middlewares e ordem de execução
 
 ## Testes
 
-O projeto utiliza o test runner nativo do Bun.
 ```bash
 bun test
 ```
