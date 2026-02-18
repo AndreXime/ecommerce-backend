@@ -4,6 +4,8 @@ model Cart {
   user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   items  CartItem[]
 
+  reminderSentAt DateTime? @map("reminder_sent_at")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

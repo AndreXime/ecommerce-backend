@@ -6,7 +6,7 @@ import { registerRoutes } from "@/modules";
 import { PrismaDatabase } from "./database/database";
 import { log, setupDocs, showRoutes } from "./lib/dev";
 import environment from "./lib/environment";
-import { setupEmailWorker, setupPromotionScheduler } from "./lib/queue";
+import { setupAbandonedCartScheduler, setupEmailWorker, setupPromotionScheduler } from "./lib/queue";
 import redis from "./lib/redis";
 import storage from "./lib/storage";
 import cors from "./middlewares/cors";
@@ -49,5 +49,6 @@ await PrismaDatabase.testConnection();
 await redis.testConnection();
 await setupEmailWorker();
 await setupPromotionScheduler();
+await setupAbandonedCartScheduler();
 
 export default server;
