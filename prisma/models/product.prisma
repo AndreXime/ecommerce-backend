@@ -1,0 +1,83 @@
+model Category {
+  id       String    @id @default(uuid(7)) @db.Uuid
+  name     String    @unique
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id                 String   @id @default(uuid(7)) @db.Uuid
+  name               String
+  tag                String
+  price              Decimal  @db.Decimal(10, 2)
+  discountPercentage Decimal? @db.Decimal(5, 2)
+  rating             Decimal  @default(0) @db.Decimal(3, 2)
+  reviewsCount       Int      @default(0)
+  isNew              Boolean  @default(false)
+  inStock            Boolean  @default(true)
+  quantitySold       Int      @default(0)
+  description        String
+  specs              Json     @default("{}")
+
+  categoryId String   @db.Uuid
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  images       ProductImage[]
+  options      SelectableOption[]
+  reviews      Review[]
+  wishlistItems WishlistItem[]
+  orderItems   OrderItem[]
+  cartItems    CartItem[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+model ProductImage {
+  id        String  @id @default(uuid(7)) @db.Uuid
+  url       String
+  position  Int     @default(0)
+  productId String  @db.Uuid
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+}
+
+enum UIType {
+  color
+  pill
+  select
+}
+
+model SelectableOption {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  label     String
+  uiType    UIType
+  values    String[]
+  productId String   @db.Uuid
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("selectable_options")
+}
+
+model Review {
+  id       String   @id @default(uuid(7)) @db.Uuid
+  author   String
+  avatar   String?
+  initials String?
+  rating   Int
+  title    String
+  content  String
+  date     DateTime @default(now())
+
+  productId String  @db.Uuid
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  userId String? @db.Uuid
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("reviews")
+}

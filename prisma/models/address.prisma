@@ -1,0 +1,25 @@
+model Address {
+  id        String  @id @default(uuid(7)) @db.Uuid
+  type      String
+  street    String
+  city      String
+  isDefault Boolean @default(false) @map("is_default")
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("addresses")
+}
+
+model PaymentCard {
+  id     String @id @default(uuid(7)) @db.Uuid
+  brand  String
+  last4  String
+  holder String
+  expiry String
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payment_cards")
+}

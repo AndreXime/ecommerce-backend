@@ -1,0 +1,38 @@
+enum OrderStatus {
+  delivered
+  intransit
+  cancelled
+}
+
+model Order {
+  id     String      @id @default(uuid(7)) @db.Uuid
+  total  Decimal     @db.Decimal(10, 2)
+  status OrderStatus @default(intransit)
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id      String  @id @default(uuid(7)) @db.Uuid
+  name    String
+  variant String?
+  img     String?
+  quantity Int    @default(1)
+  price   Decimal @db.Decimal(10, 2)
+
+  orderId String @db.Uuid
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String?  @db.Uuid
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@map("order_items")
+}
