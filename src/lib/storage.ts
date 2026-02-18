@@ -27,29 +27,30 @@ class StorageProvider {
 	}
 
 	/** Retorna o link de upload para o frontend */
-	async getUploadUrl(fileType: string, fileKey?: string | null, metadata?: Record<string, string>) {
+	async getUploadUrl(options: {
+		fileType: string;
+		fileKey?: string | null;
+		metadata?: Record<string, string>;
+		cacheControl?: string;
+	}) {
 		try {
-			if (!fileKey) {
-				fileKey = randomUUID();
-			}
+			const fileKey = options.fileKey ?? randomUUID();
 
 			const signedUrl = await getSignedUrl(
 				this.client,
 				new PutObjectCommand({
 					Bucket: environment.S3_BUCKET,
 					Key: fileKey,
-					ContentType: fileType,
-					Metadata: metadata,
+					ContentType: options.fileType,
+					CacheControl: options.cacheControl,
+					Metadata: options.metadata,
 				}),
 				{
 					expiresIn: 600,
 				},
 			);
 
-			return {
-				uploadUrl: signedUrl,
-				fileKey,
-			};
+			return { uploadUrl: signedUrl, fileKey };
 		} catch {
 			throw new Error("Falha ao gerar URL de upload de arquivo");
 		}
@@ -89,50 +90,34 @@ class StorageProvider {
 			return true;
 		} catch (error) {
 			console.error(`Erro ao deletar arquivo ${fileKey}:`, error);
-			// Dependendo da sua estratégia, você pode lançar erro ou apenas retornar false
 			throw new Error("Falha ao deletar arquivo");
 		}
 	}
 
-	async uploadFile(
-		fileData: Buffer | ReadableStream,
-		fileType: string,
-		fileKey?: string | null,
-		metadata?: Record<string, string>,
-	) {
+	async uploadFile(options: {
+		data: Buffer | ReadableStream;
+		fileType: string;
+		fileKey?: string | null;
+		metadata?: Record<string, string>;
+		cacheControl?: string;
+	}) {
 		try {
-			if (!fileKey) {
-				fileKey = randomUUID();
-			}
+			const fileKey = options.fileKey ?? randomUUID();
 
 			await this.client.send(
 				new PutObjectCommand({
 					Bucket: environment.S3_BUCKET,
 					Key: fileKey,
-					Body: fileData,
-					ContentType: fileType,
-					Metadata: metadata,
+					Body: options.data,
+					ContentType: options.fileType,
+					CacheControl: options.cacheControl,
+					Metadata: options.metadata,
 				}),
 			);
 
-			const signedUrl = await getSignedUrl(
-				this.client,
-				new GetObjectCommand({
-					Bucket: environment.S3_BUCKET,
-					Key: fileKey,
-				}),
-				{
-					expiresIn: 600,
-					signableHeaders: new Set(["content-type"]),
-				},
-			);
-
-			return {
-				fileKey,
-				downloadUrl: signedUrl,
-			};
+			return { fileKey };
 		} catch (error) {
-			console.error("Falha ao fazer upload direto para o bucket processed:", error);
+			console.error("Falha ao fazer upload direto para o bucket:", error);
 			throw new Error("Falha ao fazer upload direto do arquivo");
 		}
 	}
