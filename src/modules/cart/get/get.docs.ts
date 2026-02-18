@@ -1,0 +1,19 @@
+import { createRoute } from "@hono/zod-openapi";
+import auth from "@/middlewares/auth";
+import { CartSchema } from "@/modules/shared/schemas/cart";
+
+export const CartGetRoute = createRoute({
+	method: "get",
+	path: "/",
+	tags: ["Cart"],
+	summary: "Obter carrinho",
+	security: [{ Bearer: [] }],
+	middleware: [auth([])],
+	responses: {
+		200: {
+			description: "Carrinho do usuário",
+			content: { "application/json": { schema: CartSchema } },
+		},
+		401: { description: "Não autenticado" },
+	},
+});
