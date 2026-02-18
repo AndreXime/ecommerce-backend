@@ -1,15 +1,13 @@
 import { MeRoute } from "./me.docs";
-import { getUserById } from "./me.service";
+import { getUserProfile } from "./me.service";
 
 export const registerRoutesMe = (server: ServerType) => {
 	server.openapi(MeRoute, async (ctx) => {
-		const currentUser = ctx.get("user");
-		const user = await getUserById(currentUser.id);
+		const { id } = ctx.get("user");
+		const profile = await getUserProfile(id);
 
-		if (!user) {
-			return ctx.json({ message: "Usuário não encontrado" }, 404);
-		}
+		if (!profile) return ctx.json({ message: "Usuário não encontrado" }, 404);
 
-		return ctx.json(user, 200);
+		return ctx.json(profile, 200);
 	});
 };

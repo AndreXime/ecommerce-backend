@@ -6,25 +6,15 @@ export const MeRoute = createRoute({
 	method: "get",
 	path: "/me",
 	tags: ["User"],
-	summary: "Obter perfil atual",
-	description: "Retorna os dados do usuário autenticado baseado no token enviado.",
-	security: [
-		{
-			Bearer: [],
-		},
-	],
+	summary: "Obter perfil completo",
+	description: "Retorna todos os dados do usuário autenticado: dados pessoais, pedidos, wishlist, cartões e endereços.",
+	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	responses: {
 		200: {
-			description: "Perfil do usuário",
-			content: {
-				"application/json": {
-					schema: MeResponseSchema,
-				},
-			},
+			description: "Perfil completo do usuário",
+			content: { "application/json": { schema: MeResponseSchema } },
 		},
-		401: {
-			description: "Não autorizado",
-		},
+		401: { description: "Não autorizado" },
 	},
 });
