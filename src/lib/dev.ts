@@ -14,7 +14,7 @@ export function log(message: string, cor: keyof typeof CORES_ANSI) {
 }
 
 export function setupDocs(server: ServerType) {
-	server.doc("/doc", {
+	server.doc("/docs-json", {
 		openapi: "3.0.0",
 		info: {
 			version: "1.0.0",
@@ -24,11 +24,11 @@ export function setupDocs(server: ServerType) {
 	});
 
 	server.get(
-		"/ui",
+		"/docs",
 		Scalar({
 			pageTitle: "Documentação da API",
 			theme: "moon",
-			url: "/doc",
+			url: "/docs-json",
 			layout: "classic",
 			hideSearch: true,
 			showDeveloperTools: "never",
