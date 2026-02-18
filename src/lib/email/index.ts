@@ -2,9 +2,9 @@ import { Queue, Worker } from "bullmq";
 import nodemailer from "nodemailer";
 import { log } from "@/lib/dev";
 import environment from "@/lib/environment";
-import { dispatchAbandonedCarts, dispatchPromotions } from "./email/dispatchers";
-import { abandonedCartTemplate, forgotPasswordTemplate, promotionTemplate, welcomeTemplate } from "./email/templates";
-import type { AbandonedCartJob, EmailJobData, ForgotPasswordJob, PromotionJob, WelcomeJob } from "./email/types";
+import { dispatchAbandonedCarts, dispatchPromotions } from "./dispatchers";
+import { abandonedCartTemplate, forgotPasswordTemplate, promotionTemplate, welcomeTemplate } from "./templates";
+import type { AbandonedCartJob, EmailJobData, ForgotPasswordJob, PromotionJob, WelcomeJob } from "./types";
 
 const FROM = '"Ecommerce" <noreply@ecommerce.com>';
 const PROMOTION_INTERVAL_MS = 36 * 60 * 60 * 1000;
@@ -34,7 +34,7 @@ export async function sendForgotPasswordEmail(user: { name: string; email: strin
 
 // ─── Handlers do worker ───────────────────────────────────────────────────────
 
-const dispatch = (type: string) => !type.startsWith("dispatch-");
+const isDirectEmail = (type: string) => !type.startsWith("dispatch-");
 
 const emailHandlers: Record<string, (data: EmailJobData) => Promise<unknown>> = {
 	welcome: (data) => {
@@ -88,7 +88,7 @@ export const setupEmailWorker = async () => {
 	);
 
 	worker.on("completed", (job) => {
-		if (dispatch(job.data.type)) {
+		if (isDirectEmail(job.data.type)) {
 			log(`[Worker] Email "${job.data.type}" enviado para ${(job.data as { email: string }).email}`, "success");
 		}
 	});

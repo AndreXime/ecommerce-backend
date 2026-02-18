@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { database } from "@/database/database";
+import { sendForgotPasswordEmail } from "@/lib/email";
 import environment from "@/lib/environment";
-import { sendForgotPasswordEmail } from "@/lib/queue";
 import { hashToken } from "@/modules/auth/shared/hash";
 
 const TOKEN_EXPIRATION_MS = 60 * 60 * 1000; // 1 hora

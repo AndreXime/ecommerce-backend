@@ -1,6 +1,6 @@
 import { HTTPException } from "hono/http-exception";
 import { database } from "@/database/database";
-import { sendWelcomeEmail } from "@/lib/queue";
+import { sendWelcomeEmail } from "@/lib/email";
 import { hashPassword } from "@/modules/auth/shared/hash";
 import { generateAuthTokens } from "../shared/tokens";
 import type { RegisterRequest } from "./register.schema";
