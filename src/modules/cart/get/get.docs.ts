@@ -7,6 +7,8 @@ export const CartGetRoute = createRoute({
 	path: "/",
 	tags: ["Cart"],
 	summary: "Obter carrinho",
+	description:
+		"Retorna o carrinho ativo do usuário com todos os itens, quantidades, variantes selecionadas e totais calculados.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	responses: {

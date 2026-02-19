@@ -6,6 +6,7 @@ export const CategoryListRoute = createRoute({
 	path: "/",
 	tags: ["Categories"],
 	summary: "Listar categorias",
+	description: "Retorna todas as categorias disponíveis no catálogo.",
 	responses: {
 		200: {
 			description: "Lista de categorias",

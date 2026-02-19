@@ -7,6 +7,7 @@ export const CategoryCreateRoute = createRoute({
 	path: "/",
 	tags: ["Categories"],
 	summary: "Criar categoria",
+	description: "Cria uma nova categoria de produtos no catálogo.",
 	security: [{ Bearer: [] }],
 	middleware: [auth(["ADMIN"])],
 	request: {

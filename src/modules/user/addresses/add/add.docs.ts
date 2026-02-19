@@ -7,6 +7,7 @@ export const AddressAddRoute = createRoute({
 	path: "/me/addresses",
 	tags: ["User"],
 	summary: "Adicionar endereço",
+	description: "Adiciona um novo endereço de entrega ao perfil do usuário autenticado.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {

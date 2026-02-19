@@ -7,6 +7,7 @@ export const ProductRemoveRoute = createRoute({
 	path: "/:id",
 	tags: ["Products"],
 	summary: "Remover produto",
+	description: "Remove permanentemente um produto do catálogo, incluindo suas imagens e reviews associadas.",
 	security: [{ Bearer: [] }],
 	middleware: [auth(["ADMIN"])],
 	request: {

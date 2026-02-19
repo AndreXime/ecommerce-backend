@@ -8,6 +8,7 @@ export const CartUpdateItemRoute = createRoute({
 	path: "/items/:productId",
 	tags: ["Cart"],
 	summary: "Atualizar item do carrinho",
+	description: "Atualiza a quantidade e/ou variante selecionada de um item existente no carrinho.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {

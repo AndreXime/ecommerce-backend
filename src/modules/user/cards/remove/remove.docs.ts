@@ -7,6 +7,7 @@ export const CardRemoveRoute = createRoute({
 	path: "/me/cards/:cardId",
 	tags: ["User"],
 	summary: "Remover cartão de pagamento",
+	description: "Remove permanentemente um cartão de pagamento do perfil do usuário autenticado.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {

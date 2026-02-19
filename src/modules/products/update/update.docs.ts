@@ -8,6 +8,7 @@ export const ProductUpdateRoute = createRoute({
 	path: "/:id",
 	tags: ["Products"],
 	summary: "Atualizar produto",
+	description: "Atualiza parcialmente os dados de um produto existente.",
 	security: [{ Bearer: [] }],
 	middleware: [auth(["ADMIN"])],
 	request: {

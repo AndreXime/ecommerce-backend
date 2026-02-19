@@ -7,6 +7,7 @@ export const AddressRemoveRoute = createRoute({
 	path: "/me/addresses/:addressId",
 	tags: ["User"],
 	summary: "Remover endereço",
+	description: "Remove permanentemente um endereço do perfil do usuário autenticado.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {

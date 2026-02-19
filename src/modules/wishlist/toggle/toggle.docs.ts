@@ -6,7 +6,7 @@ export const WishlistToggleRoute = createRoute({
 	method: "post",
 	path: "/:productId",
 	tags: ["Wishlist"],
-	summary: "Toggle produto na wishlist",
+	summary: "Adicionar ou remover produto da wishlist",
 	description: "Adiciona o produto à wishlist se não estiver, remove se já estiver.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],

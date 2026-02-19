@@ -7,6 +7,7 @@ export const CardAddRoute = createRoute({
 	path: "/me/cards",
 	tags: ["User"],
 	summary: "Adicionar cartão de pagamento",
+	description: "Salva os dados de referência de um cartão de pagamento no perfil do usuário autenticado.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {

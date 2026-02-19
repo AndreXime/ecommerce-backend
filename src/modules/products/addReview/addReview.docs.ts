@@ -7,6 +7,8 @@ export const AddReviewRoute = createRoute({
 	path: "/:id/reviews",
 	tags: ["Products"],
 	summary: "Avaliar produto",
+	description:
+		"Adiciona uma avaliação ao produto em nome do usuário autenticado. O rating médio e a contagem de avaliações do produto são recalculados automaticamente.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {

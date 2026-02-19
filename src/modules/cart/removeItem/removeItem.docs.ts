@@ -8,6 +8,7 @@ export const CartRemoveItemRoute = createRoute({
 	path: "/items/:productId",
 	tags: ["Cart"],
 	summary: "Remover item do carrinho",
+	description: "Remove um produto do carrinho pelo ID do produto.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {

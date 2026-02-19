@@ -8,6 +8,7 @@ export const OrderUpdateStatusRoute = createRoute({
 	path: "/:id/status",
 	tags: ["Orders"],
 	summary: "Atualizar status do pedido",
+	description: "Atualiza o status de um pedido. Operação restrita a administradores.",
 	security: [{ Bearer: [] }],
 	middleware: [auth(["ADMIN"])],
 	request: {

@@ -8,6 +8,8 @@ export const CartAddItemRoute = createRoute({
 	path: "/items",
 	tags: ["Cart"],
 	summary: "Adicionar item ao carrinho",
+	description:
+		"Adiciona um produto ao carrinho. Se o produto já existir, a quantidade é acumulada. O carrinho é criado automaticamente caso não exista.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {

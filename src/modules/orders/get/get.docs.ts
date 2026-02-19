@@ -8,6 +8,8 @@ export const OrderGetRoute = createRoute({
 	path: "/:id",
 	tags: ["Orders"],
 	summary: "Detalhes do pedido",
+	description:
+		"Retorna os detalhes completos de um pedido. Usuários autenticados só podem acessar seus próprios pedidos; admins podem acessar qualquer pedido.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {

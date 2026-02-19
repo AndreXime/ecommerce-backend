@@ -6,7 +6,8 @@ export const ProductListRoute = createRoute({
 	path: "/",
 	tags: ["Products"],
 	summary: "Listar produtos",
-	description: "Retorna produtos com paginação e filtros.",
+	description:
+		"Retorna produtos paginados com suporte a filtros por categoria, faixa de preço, disponibilidade em estoque e busca textual por nome ou tag.",
 	request: {
 		query: ProductListQuerySchema,
 	},

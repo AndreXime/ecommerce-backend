@@ -7,6 +7,7 @@ export const AddressUpdateRoute = createRoute({
 	path: "/me/addresses/:addressId",
 	tags: ["User"],
 	summary: "Atualizar endereço",
+	description: "Atualiza os dados de um endereço existente pertencente ao usuário autenticado.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {
