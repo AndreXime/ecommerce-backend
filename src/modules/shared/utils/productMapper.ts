@@ -35,6 +35,9 @@ export function toProductDetails(p: ProductWithRelations) {
 		quantitySold: p.quantitySold,
 		description: p.description,
 		specs: p.specs as Record<string, string>,
+		images: p.images
+			.sort((a, b) => a.position - b.position)
+			.map((img) => ({ id: img.id, url: img.url, position: img.position })),
 		options: p.options?.map((opt) => ({
 			id: opt.id,
 			label: opt.label,

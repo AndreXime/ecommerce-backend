@@ -6,7 +6,7 @@ export const ProductGetRoute = createRoute({
 	path: "/:id",
 	tags: ["Products"],
 	summary: "Detalhes do produto",
-	description: "Retorna os detalhes completos de um produto, incluindo opções e reviews.",
+	description: "Retorna os detalhes completos de um produto, incluindo imagens (com id), opções e reviews.",
 	request: {
 		params: ProductIdParamSchema,
 	},

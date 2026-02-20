@@ -47,6 +47,7 @@ export const ProductDetailsSchema = ProductSummarySchema.extend({
 	quantitySold: z.number().int(),
 	description: z.string(),
 	specs: z.record(z.string(), z.string()),
+	images: z.array(ProductImageSchema),
 	options: z.array(SelectableOptionSchema).optional(),
 	fullReviews: z.array(ReviewSchema).optional(),
 });
