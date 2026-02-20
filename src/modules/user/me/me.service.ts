@@ -30,6 +30,7 @@ export async function getUserProfile(userId: string) {
 			email: user.email,
 			registration: user.registration,
 			phone: user.phone,
+			role: user.role,
 			registredAt: user.createdAt.toISOString(),
 		},
 		ordersHistory: user.orders.map(toOrder),

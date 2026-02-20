@@ -9,6 +9,7 @@ export const MeResponseSchema = z.object({
 		email: z.string(),
 		registration: z.string().nullable(),
 		phone: z.string().nullable(),
+		role: z.enum(["ADMIN", "CUSTOMER", "SUPPORT"]),
 		registredAt: z.iso.datetime(),
 	}),
 	ordersHistory: z.array(OrderSchema),
