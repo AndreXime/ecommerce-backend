@@ -14,8 +14,12 @@ export async function generateRefreshTokens(refreshTokenRaw: string) {
 		throw new HTTPException(401, { message: "Token inválido" });
 	}
 
-	if (tokenRecord.revoked || new Date() > tokenRecord.expiresAt) {
-		throw new HTTPException(401, { message: "Token expirado ou revogado" });
+	if (tokenRecord.revoked) {
+		throw new HTTPException(401, { message: "Token revogado" });
+	}
+
+	if (new Date() > tokenRecord.expiresAt) {
+		throw new HTTPException(401, { message: "Token expirado" });
 	}
 
 	// Revoga o token atual para ele não ser usado novamente
