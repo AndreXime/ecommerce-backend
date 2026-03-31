@@ -18,8 +18,8 @@ export function setupDocs(server: ServerType) {
 		openapi: "3.0.0",
 		info: {
 			version: "1.0.0",
-			title: "API Template - Andre OS",
-			description: "Documentação automática via Hono OpenAPI",
+			title: "API Ecommerce",
+			description: "Documentação automática via Hono OpenAPI.",
 		},
 	});
 
