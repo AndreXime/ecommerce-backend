@@ -1,6 +1,7 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import { database } from "@/database/database";
 import app from "@/index";
+import environment from "@/lib/environment";
 
 const generateEmail = () => `test_${Date.now()}@example.com`;
 
@@ -10,7 +11,7 @@ describe("POST /auth/register", () => {
 	test("Deve registar um novo utilizador com sucesso (201)", async () => {
 		const res = await app.request("/auth/register", {
 			method: "POST",
-			headers: { "Content-Type": "application/json" },
+			headers: { "Content-Type": "application/json", Origin: environment.FRONTEND_URL },
 			body: JSON.stringify({
 				name: "Test User",
 				email: userEmail,
@@ -32,7 +33,7 @@ describe("POST /auth/register", () => {
 	test("Deve falhar se as senhas não coincidirem (400)", async () => {
 		const res = await app.request("/auth/register", {
 			method: "POST",
-			headers: { "Content-Type": "application/json" },
+			headers: { "Content-Type": "application/json", Origin: environment.FRONTEND_URL },
 			body: JSON.stringify({
 				name: "Fail User",
 				email: generateEmail(),
@@ -48,7 +49,7 @@ describe("POST /auth/register", () => {
 		// Tenta registar novamente o mesmo e-mail do primeiro teste
 		const res = await app.request("/auth/register", {
 			method: "POST",
-			headers: { "Content-Type": "application/json" },
+			headers: { "Content-Type": "application/json", Origin: environment.FRONTEND_URL },
 			body: JSON.stringify({
 				name: "Duplicate User",
 				email: userEmail, // Mesmo e-mail

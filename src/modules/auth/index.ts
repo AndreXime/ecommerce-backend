@@ -1,4 +1,5 @@
 import createRouter from "@/lib/createRouter";
+import environment from "@/lib/environment";
 import rateLimiter from "@/middlewares/rate-limiter";
 import { registerRoutesForgotPassword } from "./forgotPassword/forgotPassword.controller";
 import { registerRoutesSignIn } from "./login/login.controller";
@@ -9,10 +10,11 @@ import { registerRoutesResetPassword } from "./resetPassword/resetPassword.contr
 
 export const createAuthRoutes = () => {
 	const app = createRouter();
+	const authRateLimit = environment.ENV === "TEST" ? 100 : 10;
 
-	// 10 tentativas a cada 15 minutos
+	// Em testes aumentamos o teto para evitar interferência entre casos da suíte.
 	// Isto impede brute-force no login e criação de contas em massa.
-	app.use(rateLimiter(10, 15, "auth_strict"));
+	app.use(rateLimiter(authRateLimit, 15, "auth_strict"));
 
 	registerRoutesSignIn(app);
 	registerRoutesSignUp(app);

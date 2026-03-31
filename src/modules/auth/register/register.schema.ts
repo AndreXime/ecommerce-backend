@@ -3,6 +3,7 @@ import { UserSchema } from "@/modules/shared/schemas/user";
 
 export const RegisterRequestSchema = UserSchema.omit({
 	id: true,
+	role: true,
 	createdAt: true,
 	updatedAt: true,
 })

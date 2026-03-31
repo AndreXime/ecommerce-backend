@@ -3,6 +3,7 @@ import { deleteCookie, getCookie } from "hono/cookie";
 import { verify } from "hono/jwt";
 import type { AppBindings, JWT } from "@/@types/declarations";
 import type { Roles } from "@/database/client/enums";
+import { database } from "@/database/database";
 import environment from "@/lib/environment";
 import blocklist from "@/modules/auth/shared/blocklist";
 
@@ -32,6 +33,20 @@ export default function auth(requiredRoles: Roles[]): MiddlewareHandler<AppBindi
 
 			if (requiredRoles.length > 0 && !requiredRoles.includes(userPayload.role)) {
 				return ctx.json({ message: "Acesso negado: Permissão insuficiente." }, 403);
+			}
+
+			const user = await database.user.findUnique({
+				where: { id: userPayload.id },
+				select: { id: true, role: true, sessionVersion: true, deletedAt: true },
+			});
+
+			if (!user || user.deletedAt) {
+				return ctx.json({ message: "Token invalido ou expirado" }, 401);
+			}
+
+			if (user.sessionVersion !== userPayload.sessionVersion) {
+				deleteCookie(ctx, "accessToken");
+				return ctx.json({ message: "Sessão expirada. Faça login novamente." }, 401);
 			}
 
 			if (userPayload.jti) {

@@ -1,11 +1,15 @@
 import { describe, expect, test } from "bun:test";
 import app from "@/index";
+import environment from "@/lib/environment";
 
 describe("POST /auth/logout", () => {
 	test("Deve realizar logout e limpar cookies (200)", async () => {
 		// Mesmo sem estar logado, o logout deve processar a limpeza dos cookies
 		const res = await app.request("/auth/logout", {
 			method: "POST",
+			headers: {
+				Origin: environment.FRONTEND_URL,
+			},
 		});
 
 		expect(res.status).toBe(200);

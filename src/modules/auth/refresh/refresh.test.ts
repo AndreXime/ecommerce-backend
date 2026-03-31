@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { database } from "@/database/database";
 import app from "@/index";
+import environment from "@/lib/environment";
 import { hashPassword } from "@/modules/auth/shared/hash";
 
 describe("POST /auth/refresh", () => {
@@ -17,7 +18,7 @@ describe("POST /auth/refresh", () => {
 		// 2. Fazer Login para obter o cookie inicial
 		const loginRes = await app.request("/auth/login", {
 			method: "POST",
-			headers: { "Content-Type": "application/json" },
+			headers: { "Content-Type": "application/json", Origin: environment.FRONTEND_URL },
 			body: JSON.stringify({ email, password: "123456" }),
 		});
 
@@ -39,6 +40,7 @@ describe("POST /auth/refresh", () => {
 			method: "POST",
 			headers: {
 				Cookie: refreshTokenCookie,
+				Origin: environment.FRONTEND_URL,
 			},
 		});
 
@@ -53,6 +55,9 @@ describe("POST /auth/refresh", () => {
 	test("Deve falhar sem o cookie de refresh (401)", async () => {
 		const res = await app.request("/auth/refresh", {
 			method: "POST",
+			headers: {
+				Origin: environment.FRONTEND_URL,
+			},
 		});
 
 		expect(res.status).toBe(401);

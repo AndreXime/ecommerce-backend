@@ -17,6 +17,7 @@ model User {
   reviews            Review[]
   cart               Cart?
   passwordResetTokens PasswordResetToken[]
+  sessionVersion     Int      @default(0) @map("session_version")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")

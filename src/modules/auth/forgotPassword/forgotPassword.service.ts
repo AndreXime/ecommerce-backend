@@ -14,21 +14,22 @@ export async function requestPasswordReset(email: string) {
 
 	// Resposta genérica independente de o email existir — evita user enumeration
 	if (!user) return;
-
-	// Invalida tokens anteriores pendentes do mesmo usuário
-	await database.passwordResetToken.deleteMany({
-		where: { userId: user.id, usedAt: null },
-	});
-
 	const rawToken = randomUUID();
 	const hashedToken = hashToken(rawToken);
+	const expiresAt = new Date(Date.now() + TOKEN_EXPIRATION_MS);
 
-	await database.passwordResetToken.create({
-		data: {
-			userId: user.id,
-			token: hashedToken,
-			expiresAt: new Date(Date.now() + TOKEN_EXPIRATION_MS),
-		},
+	await database.$transaction(async (tx) => {
+		await tx.passwordResetToken.deleteMany({
+			where: { userId: user.id, usedAt: null },
+		});
+
+		await tx.passwordResetToken.create({
+			data: {
+				userId: user.id,
+				token: hashedToken,
+				expiresAt,
+			},
+		});
 	});
 
 	const resetLink = `${environment.FRONTEND_URL}/reset-password?token=${rawToken}`;

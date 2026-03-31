@@ -21,6 +21,7 @@ type JWT = {
 	name: string;
 	role: Roles;
 	jti: string;
+	sessionVersion: number;
 	exp: number;
 };
 

@@ -5,34 +5,40 @@ import { generateAuthTokens } from "../shared/tokens";
 
 export async function generateRefreshTokens(refreshTokenRaw: string) {
 	const hashedToken = hashToken(refreshTokenRaw);
+	const now = new Date();
 
-	const tokenRecord = await database.refreshToken.findUnique({
-		where: { hashedToken },
+	return database.$transaction(async (tx) => {
+		const tokenRecord = await tx.refreshToken.findUnique({
+			where: { hashedToken },
+		});
+
+		if (!tokenRecord) {
+			throw new HTTPException(401, { message: "Token inválido" });
+		}
+
+		const consumeResult = await tx.refreshToken.updateMany({
+			where: {
+				id: tokenRecord.id,
+				revoked: false,
+				expiresAt: { gt: now },
+			},
+			data: { revoked: true },
+		});
+
+		if (consumeResult.count !== 1) {
+			if (tokenRecord.revoked) {
+				throw new HTTPException(401, { message: "Token revogado" });
+			}
+
+			throw new HTTPException(401, { message: "Token expirado" });
+		}
+
+		const user = await tx.user.findUnique({ where: { id: tokenRecord.userId } });
+
+		if (!user) {
+			throw new HTTPException(401, { message: "Usuário não encontrado" });
+		}
+
+		return generateAuthTokens(user.id, user.email, user.name, user.role, user.sessionVersion, tx);
 	});
-
-	if (!tokenRecord) {
-		throw new HTTPException(401, { message: "Token inválido" });
-	}
-
-	if (tokenRecord.revoked) {
-		throw new HTTPException(401, { message: "Token revogado" });
-	}
-
-	if (new Date() > tokenRecord.expiresAt) {
-		throw new HTTPException(401, { message: "Token expirado" });
-	}
-
-	// Revoga o token atual para ele não ser usado novamente
-	await database.refreshToken.update({
-		where: { id: tokenRecord.id },
-		data: { revoked: true },
-	});
-
-	const user = await database.user.findUnique({ where: { id: tokenRecord.userId } });
-
-	if (!user) throw new HTTPException(401, { message: "Usuário não encontrado" });
-
-	const newTokens = await generateAuthTokens(user.id, user.email, user.name, user.role);
-
-	return newTokens;
 }

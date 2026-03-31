@@ -4,30 +4,42 @@ import { hashPassword, hashToken } from "@/modules/auth/shared/hash";
 
 export async function resetPassword(rawToken: string, newPassword: string) {
 	const hashedToken = hashToken(rawToken);
-
-	const record = await database.passwordResetToken.findUnique({
-		where: { token: hashedToken },
-	});
-
-	if (!record || record.usedAt || record.expiresAt < new Date()) {
-		throw new HTTPException(400, { message: "Token inválido ou expirado." });
-	}
-
 	const newHash = await hashPassword(newPassword);
+	const now = new Date();
 
-	await database.$transaction([
-		database.user.update({
+	await database.$transaction(async (tx) => {
+		const record = await tx.passwordResetToken.findUnique({
+			where: { token: hashedToken },
+		});
+
+		if (!record) {
+			throw new HTTPException(400, { message: "Token inválido ou expirado." });
+		}
+
+		const consumeResult = await tx.passwordResetToken.updateMany({
+			where: {
+				id: record.id,
+				usedAt: null,
+				expiresAt: { gt: now },
+			},
+			data: { usedAt: now },
+		});
+
+		if (consumeResult.count !== 1) {
+			throw new HTTPException(400, { message: "Token inválido ou expirado." });
+		}
+
+		await tx.user.update({
 			where: { id: record.userId },
-			data: { password: newHash },
-		}),
-		database.passwordResetToken.update({
-			where: { id: record.id },
-			data: { usedAt: new Date() },
-		}),
-		// Revoga todos os refresh tokens ativos para forçar novo login
-		database.refreshToken.updateMany({
+			data: {
+				password: newHash,
+				sessionVersion: { increment: 1 },
+			},
+		});
+
+		await tx.refreshToken.updateMany({
 			where: { userId: record.userId, revoked: false },
 			data: { revoked: true },
-		}),
-	]);
+		});
+	});
 }

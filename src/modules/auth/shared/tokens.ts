@@ -1,22 +1,32 @@
 import type { Context } from "hono";
 import { setCookie } from "hono/cookie";
 import { sign } from "hono/jwt";
+import type { Prisma } from "prisma";
 import type { Roles } from "@/database/client/enums";
 import { database } from "@/database/database";
 import environment from "@/lib/environment";
 import { hashToken } from "@/modules/auth/shared/hash";
 
-export async function generateAuthTokens(userId: string, email: string, name: string, role: Roles) {
+type RefreshTokenClient = Pick<Prisma.TransactionClient, "refreshToken">;
+
+export async function generateAccessToken(
+	userId: string,
+	email: string,
+	name: string,
+	role: Roles,
+	sessionVersion: number,
+) {
 	const now = Math.floor(Date.now() / 1000);
 	const jti = crypto.randomUUID();
 
-	const accessToken = await sign(
+	return sign(
 		{
 			id: userId,
 			email,
 			name,
 			jti,
 			role,
+			sessionVersion,
 			type: "access",
 			iat: now,
 			exp: now + environment.JWT_ACCESS_EXPIRATION,
@@ -24,10 +34,12 @@ export async function generateAuthTokens(userId: string, email: string, name: st
 		environment.JWT_SECRET,
 		"HS256",
 	);
+}
 
+export async function createRefreshToken(userId: string, client: RefreshTokenClient = database) {
 	const refreshTokenRaw = crypto.randomUUID();
 
-	await database.refreshToken.create({
+	await client.refreshToken.create({
 		data: {
 			userId,
 			hashedToken: hashToken(refreshTokenRaw),
@@ -35,7 +47,21 @@ export async function generateAuthTokens(userId: string, email: string, name: st
 		},
 	});
 
-	return { accessToken, refreshToken: refreshTokenRaw };
+	return refreshTokenRaw;
+}
+
+export async function generateAuthTokens(
+	userId: string,
+	email: string,
+	name: string,
+	role: Roles,
+	sessionVersion: number,
+	client: RefreshTokenClient = database,
+) {
+	const accessToken = await generateAccessToken(userId, email, name, role, sessionVersion);
+	const refreshToken = await createRefreshToken(userId, client);
+
+	return { accessToken, refreshToken };
 }
 
 export function setAuthCookies(ctx: Context, accessToken: string, refreshToken: string) {
