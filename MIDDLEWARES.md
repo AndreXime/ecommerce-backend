@@ -14,7 +14,11 @@
    - Inicializa pool de conexões com PostgreSQL
    - Injeta dependências necessárias no contexto
 
-4. **Global Rate Limiter**
+4. **CSRF Handler**
+   - Valida a origem em requisições mutáveis
+   - Retorna `403 Forbidden` se a origem não for permitida
+
+5. **Global Rate Limiter**
    - Verifica e incrementa contadores no Redis
    - Retorna `429 Too Many Requests` se limite excedido
 
@@ -31,7 +35,7 @@ Após os middlewares globais, o router decide o fluxo baseado no tipo de rota:
 ### 3. Auth Middleware (Rotas Protegidas)
 
 - Valida token de autenticação
-- Verifica blocklist e sessão no Redis
+- Verifica blocklist e versão de sessão do usuário
 - Retorna `401 Unauthorized` se falhar
 - Injeta dados do usuário no contexto
 
@@ -52,6 +56,8 @@ Captura todos os erros e retorna resposta apropriada:
 - `400` - Validação falhou
 - `401` - Não autenticado
 - `403` - Não autorizado (role insuficiente)
+- `404` - Recurso não encontrado
 - `409` - Conflito (ex: email duplicado)
 - `429` - Rate limit excedido
+- `503` - Falha de infraestrutura (ex: banco indisponível)
 - `500` - Erro interno

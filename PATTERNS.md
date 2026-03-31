@@ -89,7 +89,6 @@ Sempre incluem `Schema` no final.
 ```typescript
 export const LoginRequestSchema = ...           // body
 export const RegisterRequestSchema = ...        // body
-export const RefreshRequestSchema = ...         // cookies
 export const ReadUserRequestQuerySchema = ...   // query
 ```
 
@@ -155,6 +154,7 @@ import { UserSchema } from "@/modules/shared/schemas/user";
 // Omitir campos
 export const RegisterRequestSchema = UserSchema.omit({
   id: true,
+  role: true,
   createdAt: true,
   updatedAt: true,
 });

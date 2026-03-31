@@ -9,13 +9,14 @@ API REST completa para uma aplicação de ecommerce, desenvolvida com **Bun** e 
 ### Autenticação e Segurança
 - **Dual Token (JWT):** Access Tokens de curta duração + Refresh Tokens armazenados no PostgreSQL, ambos trafegados via cookies `HttpOnly` e `Secure`.
 - **Blocklist no Redis:** ao fazer logout, o JTI do Access Token é revogado no Redis até expirar naturalmente, eliminando a janela de uso indevido pós-logout.
+- **Versionamento de Sessão:** resets de senha invalidam sessões anteriores ao incrementar `sessionVersion`, impedindo o reuso de access tokens antigos.
 - **RBAC:** controle de acesso por cargo (`ADMIN`, `CUSTOMER`, `SUPPORT`).
 - **Proteção CSRF** integrada.
 
 ### Ecommerce
 - **Produtos:** listagem paginada com filtros (categoria, preço, estoque, busca), detalhes completos com opções selecionáveis (cor, tamanho etc.) e avaliações. Rating recalculado automaticamente a cada nova review.
 - **Categorias:** listagem pública, criação restrita a ADMIN.
-- **Carrinho:** persistido no banco por usuário. Adiciona, acumula, atualiza variante e remove itens.
+- **Carrinho:** persistido no banco por usuário. Adiciona, acumula, atualiza variante e remove itens por `cartItemId`, preservando variantes distintas do mesmo produto.
 - **Wishlist:** toggle — adiciona se não estiver, remove se já estiver.
 - **Pedidos:** criação a partir do carrinho ativo (limpa o carrinho e incrementa `quantitySold`), listagem com escopo por cargo, atualização de status (ADMIN).
 - **Perfil completo:** `GET /users/me` retorna `personalData`, `ordersHistory`, `wishlistProducts`, `paymentCards` e `addresses` — alinhado diretamente com a interface `User` do frontend.
@@ -140,7 +141,8 @@ API disponível em `http://localhost:8080` · Documentação em `http://localhos
 |---|---|---|---|
 | GET | `/products` | Público | Listagem com filtros e paginação |
 | GET | `/products/:id` | Público | Detalhes + opções + reviews |
-| POST | `/products` | ADMIN | Cria produto |
+| POST | `/products` | ADMIN | Cria o produto sem imagens |
+| POST | `/products/:id/images` | ADMIN | Gera URL de upload e registra imagem do produto |
 | PATCH | `/products/:id` | ADMIN | Atualiza produto |
 | DELETE | `/products/:id` | ADMIN | Remove produto |
 | POST | `/products/:id/reviews` | Auth | Adiciona avaliação |
@@ -160,8 +162,8 @@ API disponível em `http://localhost:8080` · Documentação em `http://localhos
 |---|---|---|---|
 | GET | `/cart` | Auth | Retorna o carrinho (criado automaticamente) |
 | POST | `/cart/items` | Auth | Adiciona item (acumula se já existir) |
-| PATCH | `/cart/items/:productId` | Auth | Atualiza quantidade / variante |
-| DELETE | `/cart/items/:productId` | Auth | Remove item |
+| PATCH | `/cart/items/:cartItemId` | Auth | Atualiza quantidade / variante |
+| DELETE | `/cart/items/:cartItemId` | Auth | Remove item |
 
 ### Wishlist — `/wishlist`
 
