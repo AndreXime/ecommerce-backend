@@ -1,6 +1,7 @@
 import type { z } from "@hono/zod-openapi";
 import { database } from "@/database/database";
 import { getCart } from "../get/get.service";
+import { buildVariantSignature, normalizeSelectedVariant } from "../shared/variantSignature";
 import type { CartAddItemBodySchema } from "./addItem.schema";
 
 type Body = z.infer<typeof CartAddItemBodySchema>;
@@ -11,9 +12,16 @@ export async function addCartItem(userId: string, body: Body) {
 		create: { userId },
 		update: {},
 	});
+	const variantSignature = buildVariantSignature(body.selectedVariant);
 
 	const existing = await database.cartItem.findUnique({
-		where: { cartId_productId: { cartId: cart.id, productId: body.productId } },
+		where: {
+			cartId_productId_variantSignature: {
+				cartId: cart.id,
+				productId: body.productId,
+				variantSignature,
+			},
+		},
 	});
 
 	await Promise.all([
@@ -27,7 +35,8 @@ export async function addCartItem(userId: string, body: Body) {
 						cartId: cart.id,
 						productId: body.productId,
 						quantity: body.quantity,
-						selectedVariant: body.selectedVariant ?? undefined,
+						selectedVariant: normalizeSelectedVariant(body.selectedVariant),
+						variantSignature,
 					},
 				}),
 		// Atualiza updatedAt e reseta o flag de lembrete para redetectar abandono futuro

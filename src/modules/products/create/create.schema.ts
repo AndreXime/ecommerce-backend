@@ -10,7 +10,6 @@ export const ProductCreateBodySchema = z.object({
 	description: z.string().min(10),
 	specs: z.record(z.string(), z.string()).optional(),
 	categoryId: z.string().uuid(),
-	images: z.array(z.object({ url: z.string().url(), position: z.number().int().min(0).optional() })).min(1),
 	options: z
 		.array(
 			z.object({

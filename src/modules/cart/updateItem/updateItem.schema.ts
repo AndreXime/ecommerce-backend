@@ -1,7 +1,7 @@
 import { z } from "@hono/zod-openapi";
 
 export const CartUpdateItemParamSchema = z.object({
-	productId: z.string().uuid(),
+	cartItemId: z.string().uuid(),
 });
 
 export const CartUpdateItemBodySchema = z.object({

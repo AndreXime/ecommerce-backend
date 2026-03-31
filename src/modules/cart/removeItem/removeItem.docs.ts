@@ -5,10 +5,10 @@ import { CartRemoveItemParamSchema } from "./removeItem.schema";
 
 export const CartRemoveItemRoute = createRoute({
 	method: "delete",
-	path: "/items/:productId",
+	path: "/items/:cartItemId",
 	tags: ["Cart"],
 	summary: "Remover item do carrinho",
-	description: "Remove um produto do carrinho pelo ID do produto.",
+	description: "Remove um item do carrinho pelo ID do item.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {

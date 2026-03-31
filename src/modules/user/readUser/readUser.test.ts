@@ -6,7 +6,7 @@ import app from "@/index";
 import environment from "@/lib/environment";
 import { hashPassword } from "@/modules/auth/shared/hash";
 
-describe("GET /user/users", () => {
+describe("GET /users", () => {
 	const adminEmail = `admin_read_${Date.now()}@example.com`;
 	const customerEmail = `customer_read_${Date.now()}@example.com`;
 	let adminToken = "";
@@ -29,6 +29,8 @@ describe("GET /user/users", () => {
 				email: admin.email,
 				name: admin.name,
 				role: admin.role,
+				jti: crypto.randomUUID(),
+				sessionVersion: admin.sessionVersion,
 				exp: Math.floor(Date.now() / 1000) + 60 * 5,
 			},
 			environment.JWT_SECRET,
@@ -50,6 +52,8 @@ describe("GET /user/users", () => {
 				email: customer.email,
 				name: customer.name,
 				role: customer.role,
+				jti: crypto.randomUUID(),
+				sessionVersion: customer.sessionVersion,
 				exp: Math.floor(Date.now() / 1000) + 60 * 5,
 			},
 			environment.JWT_SECRET,
@@ -63,7 +67,7 @@ describe("GET /user/users", () => {
 	});
 
 	test("Deve retornar lista de usuários para ADMIN (200)", async () => {
-		const res = await app.request("/user/users?page=1&limit=10", {
+		const res = await app.request("/users?page=1&limit=10", {
 			headers: { Authorization: `Bearer ${adminToken}` },
 		});
 
@@ -77,7 +81,7 @@ describe("GET /user/users", () => {
 	});
 
 	test("Deve negar acesso para CUSTOMER (403)", async () => {
-		const res = await app.request("/user/users", {
+		const res = await app.request("/users", {
 			headers: { Authorization: `Bearer ${customerToken}` },
 		});
 
@@ -85,12 +89,12 @@ describe("GET /user/users", () => {
 	});
 
 	test("Deve retornar 401 se não houver token", async () => {
-		const res = await app.request("/user/users");
+		const res = await app.request("/users");
 		expect(res.status).toBe(401);
 	});
 
 	test("Deve filtrar usuários por busca textual", async () => {
-		const res = await app.request(`/user/users?search=${adminEmail}`, {
+		const res = await app.request(`/users?search=${adminEmail}`, {
 			headers: { Authorization: `Bearer ${adminToken}` },
 		});
 

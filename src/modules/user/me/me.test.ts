@@ -5,10 +5,9 @@ import app from "@/index";
 import environment from "@/lib/environment";
 import { hashPassword } from "@/modules/auth/shared/hash";
 
-describe("GET /user/me", () => {
+describe("GET /users/me", () => {
 	const email = `me_test_${Date.now()}@example.com`;
 	let validToken = "";
-	let userId = "";
 
 	beforeAll(async () => {
 		// Criar utilizador
@@ -19,15 +18,15 @@ describe("GET /user/me", () => {
 				password: await hashPassword("123456"),
 			},
 		});
-		userId = user.id;
-
 		// Gerar token manualmente para evitar depender do endpoint de login neste teste unitário
 		validToken = await sign(
 			{
 				id: user.id,
 				email: user.email,
 				name: user.name,
-				// É importante ter o 'exp' para validação
+				role: user.role,
+				jti: crypto.randomUUID(),
+				sessionVersion: user.sessionVersion,
 				exp: Math.floor(Date.now() / 1000) + 60 * 5,
 			},
 			environment.JWT_SECRET,
@@ -39,22 +38,31 @@ describe("GET /user/me", () => {
 	});
 
 	test("Deve retornar 401 se não enviar token", async () => {
-		const res = await app.request("/user/me");
+		const res = await app.request("/users/me");
 		expect(res.status).toBe(401);
 	});
 
 	test("Deve retornar os dados do utilizador com token válido (200)", async () => {
-		const res = await app.request("/user/me", {
+		const res = await app.request("/users/me", {
 			headers: {
 				Authorization: `Bearer ${validToken}`,
 			},
 		});
 
 		expect(res.status).toBe(200);
-		const body = (await res.json()) as { email: string; id: string; password: string };
-		expect(body.email).toBe(email);
-		expect(body.id).toBe(userId);
-		// Garante que não retorna a senha
-		expect(body.password).toBeUndefined();
+		const body = (await res.json()) as {
+			personalData: { email: string; name: string; role: string };
+			ordersHistory: unknown[];
+			wishlistProducts: unknown[];
+			paymentCards: unknown[];
+			addresses: unknown[];
+		};
+		expect(body.personalData.email).toBe(email);
+		expect(body.personalData.name).toBe("Me User");
+		expect(body.personalData.role).toBe("CUSTOMER");
+		expect(body.ordersHistory).toBeInstanceOf(Array);
+		expect(body.wishlistProducts).toBeInstanceOf(Array);
+		expect(body.paymentCards).toBeInstanceOf(Array);
+		expect(body.addresses).toBeInstanceOf(Array);
 	});
 });

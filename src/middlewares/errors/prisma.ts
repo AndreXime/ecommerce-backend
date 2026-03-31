@@ -1,5 +1,5 @@
+import type { ContentfulStatusCode } from "hono/utils/http-status";
 import type { Prisma } from "prisma";
-import type { ErrorResponse } from ".";
 
 const fieldTranslations: Record<string, string> = {
 	email: "E-mail",
@@ -9,8 +9,14 @@ const fieldTranslations: Record<string, string> = {
 	phone: "Telefone",
 };
 
-const errorPrisma = (error: Prisma.PrismaClientKnownRequestError): ErrorResponse => {
-	let response: ErrorResponse = {
+type PrismaErrorResponse = {
+	status: ContentfulStatusCode;
+	message: string;
+};
+
+const errorPrisma = (error: Prisma.PrismaClientKnownRequestError): PrismaErrorResponse => {
+	let response: PrismaErrorResponse = {
+		status: 500,
 		message: "Erro interno no servidor.",
 	};
 
@@ -23,6 +29,7 @@ const errorPrisma = (error: Prisma.PrismaClientKnownRequestError): ErrorResponse
 			const translatedField = fieldTranslations[fieldName] || fieldName;
 
 			response = {
+				status: 409,
 				message: `${translatedField} já está em uso.`,
 			};
 			break;
@@ -31,6 +38,7 @@ const errorPrisma = (error: Prisma.PrismaClientKnownRequestError): ErrorResponse
 		// P2025: Registro não encontrado (comum em updates/deletes)
 		case "P2025": {
 			response = {
+				status: 404,
 				message: "Registro não encontrado ou já removido.",
 			};
 			break;
@@ -40,6 +48,7 @@ const errorPrisma = (error: Prisma.PrismaClientKnownRequestError): ErrorResponse
 		case "P2003": {
 			const fieldName = (error.meta?.modelName as string) || "campo relacionado";
 			response = {
+				status: 409,
 				message: `Não é possível completar a ação devido a dependências em: ${fieldName}.`,
 			};
 			break;
@@ -50,6 +59,7 @@ const errorPrisma = (error: Prisma.PrismaClientKnownRequestError): ErrorResponse
 		case "P5010":
 		case "P1001": {
 			response = {
+				status: 503,
 				message: "Não foi possível conectar ao banco de dados.",
 			};
 			break;
@@ -58,6 +68,7 @@ const errorPrisma = (error: Prisma.PrismaClientKnownRequestError): ErrorResponse
 		// Caso queira tratar argumentos inválidos (ex: string em campo int)
 		case "P2000": {
 			response = {
+				status: 400,
 				message: "O valor fornecido para o campo é muito longo.",
 			};
 			break;

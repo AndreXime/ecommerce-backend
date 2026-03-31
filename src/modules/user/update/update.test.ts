@@ -7,7 +7,7 @@ import { hashPassword } from "@/modules/auth/shared/hash";
 
 const makeToken = async (id: string, email: string, name: string, role: "ADMIN" | "CUSTOMER") =>
 	sign(
-		{ id, email, name, role, jti: crypto.randomUUID(), exp: Math.floor(Date.now() / 1000) + 300 },
+		{ id, email, name, role, jti: crypto.randomUUID(), sessionVersion: 0, exp: Math.floor(Date.now() / 1000) + 300 },
 		environment.JWT_SECRET,
 	);
 
@@ -62,6 +62,7 @@ describe("PUT /users", () => {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",
+				Origin: environment.FRONTEND_URL,
 				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify(body),
@@ -102,13 +103,13 @@ describe("PUT /users", () => {
 		expect(body.name).toBe("Atualizado pelo Admin");
 	});
 
-	test("Deve retornar 422 sem campos para atualizar", async () => {
+	test("Deve retornar 400 sem campos para atualizar", async () => {
 		const res = await put({ id: userId }, userToken);
-		expect(res.status).toBe(422);
+		expect(res.status).toBe(400);
 	});
 
-	test("Deve retornar 422 com newPassword sem currentPassword", async () => {
+	test("Deve retornar 400 com newPassword sem currentPassword", async () => {
 		const res = await put({ id: userId, newPassword: "novaSenha123" }, userToken);
-		expect(res.status).toBe(422);
+		expect(res.status).toBe(400);
 	});
 });

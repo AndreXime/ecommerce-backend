@@ -17,7 +17,11 @@ const errors: ErrorHandler<AppBindings> = async (error, { json }) => {
 	};
 
 	if (error instanceof Prisma.PrismaClientKnownRequestError) {
-		response = errorPrisma(error);
+		const prismaError = errorPrisma(error);
+		status = prismaError.status;
+		response = {
+			message: prismaError.message,
+		};
 	}
 
 	if (error instanceof HTTPException) {

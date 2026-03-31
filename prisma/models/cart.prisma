@@ -16,6 +16,7 @@ model CartItem {
   id              String  @id @default(uuid(7)) @db.Uuid
   quantity        Int     @default(1)
   selectedVariant Json?   @map("selected_variant")
+  variantSignature String @default("") @map("variant_signature")
 
   cartId String @db.Uuid
   cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
@@ -23,7 +24,7 @@ model CartItem {
   productId String  @db.Uuid
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@unique([cartId, productId])
+  @@unique([cartId, productId, variantSignature])
   @@map("cart_items")
 }
 

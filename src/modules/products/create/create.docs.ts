@@ -8,7 +8,8 @@ export const ProductCreateRoute = createRoute({
 	path: "/",
 	tags: ["Products"],
 	summary: "Criar produto",
-	description: "Cria um novo produto no catálogo. Imagens devem ser enviadas separadamente via POST /:id/images.",
+	description:
+		"Cria um novo produto no catálogo com seus metadados. As imagens devem ser enviadas depois via POST /:id/images.",
 	security: [{ Bearer: [] }],
 	middleware: [auth(["ADMIN"])],
 	request: {

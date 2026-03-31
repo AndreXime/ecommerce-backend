@@ -5,10 +5,10 @@ import { CartUpdateItemBodySchema, CartUpdateItemParamSchema } from "./updateIte
 
 export const CartUpdateItemRoute = createRoute({
 	method: "patch",
-	path: "/items/:productId",
+	path: "/items/:cartItemId",
 	tags: ["Cart"],
 	summary: "Atualizar item do carrinho",
-	description: "Atualiza a quantidade e/ou variante selecionada de um item existente no carrinho.",
+	description: "Atualiza a quantidade e/ou variante selecionada de um item existente no carrinho pelo ID do item.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {
