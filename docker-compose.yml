@@ -12,7 +12,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   localstack:
-    image: localstack/localstack
+    image: localstack/localstack:4.14.0
     restart: always
     ports:
       - "127.0.0.1:4566:4566"
