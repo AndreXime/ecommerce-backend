@@ -1,0 +1,773 @@
+{
+	"annotations": {
+		"list": [
+			{
+				"builtIn": 1,
+				"datasource": {
+					"type": "grafana",
+					"uid": "-- Grafana --"
+				},
+				"enable": true,
+				"hide": true,
+				"iconColor": "rgba(0, 211, 255, 1)",
+				"name": "Annotations & Alerts",
+				"type": "dashboard"
+			}
+		]
+	},
+	"editable": true,
+	"fiscalYearStartMonth": 0,
+	"graphTooltip": 0,
+	"id": null,
+	"links": [],
+	"liveNow": false,
+	"panels": [
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "prometheus"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "orange",
+								"value": 5
+							},
+							{
+								"color": "red",
+								"value": 20
+							}
+						]
+					},
+					"unit": "reqps"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 8,
+				"w": 6,
+				"x": 0,
+				"y": 0
+			},
+			"id": 1,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "area",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "12.1.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "prometheus"
+					},
+					"editorMode": "code",
+					"expr": "sum(rate(ecommerce_backend_http_requests_total{method=~\"$method\",route=~\"$route\",status=~\"$status\"}[5m]))",
+					"instant": false,
+					"legendFormat": "__auto",
+					"range": true,
+					"refId": "A"
+				}
+			],
+			"title": "Request Rate",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "prometheus"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "orange",
+								"value": 0.01
+							},
+							{
+								"color": "red",
+								"value": 0.05
+							}
+						]
+					},
+					"unit": "percentunit"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 8,
+				"w": 6,
+				"x": 6,
+				"y": 0
+			},
+			"id": 2,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "area",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "12.1.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "prometheus"
+					},
+					"editorMode": "code",
+					"expr": "sum(rate(ecommerce_backend_http_requests_total{method=~\"$method\",route=~\"$route\",status=~\"5..\"}[5m])) / clamp_min(sum(rate(ecommerce_backend_http_requests_total{method=~\"$method\",route=~\"$route\",status=~\"$status\"}[5m])), 0.000001)",
+					"instant": false,
+					"legendFormat": "__auto",
+					"range": true,
+					"refId": "A"
+				}
+			],
+			"title": "5xx Error Ratio",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "prometheus"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "orange",
+								"value": 0.2
+							},
+							{
+								"color": "red",
+								"value": 1
+							}
+						]
+					},
+					"unit": "s"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 8,
+				"w": 6,
+				"x": 12,
+				"y": 0
+			},
+			"id": 3,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "area",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "12.1.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "prometheus"
+					},
+					"editorMode": "code",
+					"expr": "histogram_quantile(0.95, sum by (le) (rate(ecommerce_backend_http_request_duration_seconds_bucket{method=~\"$method\",route=~\"$route\",status=~\"$status\"}[5m])))",
+					"instant": false,
+					"legendFormat": "__auto",
+					"range": true,
+					"refId": "A"
+				}
+			],
+			"title": "P95 Latency",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "prometheus"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "orange",
+								"value": 10
+							},
+							{
+								"color": "red",
+								"value": 50
+							}
+						]
+					},
+					"unit": "short"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 8,
+				"w": 6,
+				"x": 18,
+				"y": 0
+			},
+			"id": 4,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "area",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "12.1.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "prometheus"
+					},
+					"editorMode": "code",
+					"expr": "count(count by (route) (ecommerce_backend_http_requests_total{method=~\"$method\",route=~\"$route\",status=~\"$status\"}))",
+					"instant": true,
+					"legendFormat": "__auto",
+					"range": false,
+					"refId": "A"
+				}
+			],
+			"title": "Active Routes",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "prometheus"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "palette-classic"
+					},
+					"custom": {
+						"axisBorderShow": false,
+						"axisCenteredZero": false,
+						"axisColorMode": "text",
+						"axisLabel": "",
+						"axisPlacement": "auto",
+						"barAlignment": 0,
+						"drawStyle": "line",
+						"fillOpacity": 16,
+						"gradientMode": "none",
+						"hideFrom": {
+							"legend": false,
+							"tooltip": false,
+							"viz": false
+						},
+						"insertNulls": false,
+						"lineInterpolation": "linear",
+						"lineWidth": 2,
+						"pointSize": 4,
+						"scaleDistribution": {
+							"type": "linear"
+						},
+						"showPoints": "never",
+						"spanNulls": false,
+						"stacking": {
+							"group": "A",
+							"mode": "none"
+						},
+						"thresholdsStyle": {
+							"mode": "off"
+						}
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					},
+					"unit": "reqps"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 9,
+				"w": 12,
+				"x": 0,
+				"y": 8
+			},
+			"id": 5,
+			"options": {
+				"legend": {
+					"calcs": [],
+					"displayMode": "list",
+					"placement": "bottom",
+					"showLegend": true
+				},
+				"tooltip": {
+					"hideZeros": false,
+					"mode": "multi",
+					"sort": "none"
+				}
+			},
+			"pluginVersion": "12.1.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "prometheus"
+					},
+					"editorMode": "code",
+					"expr": "sum by (status) (rate(ecommerce_backend_http_requests_total{method=~\"$method\",route=~\"$route\",status=~\"$status\"}[5m]))",
+					"instant": false,
+					"legendFormat": "{{status}}",
+					"range": true,
+					"refId": "A"
+				}
+			],
+			"title": "Requests by Status",
+			"type": "timeseries"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "prometheus"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "palette-classic"
+					},
+					"custom": {
+						"axisBorderShow": false,
+						"axisCenteredZero": false,
+						"axisColorMode": "text",
+						"axisLabel": "",
+						"axisPlacement": "auto",
+						"barAlignment": 0,
+						"drawStyle": "line",
+						"fillOpacity": 16,
+						"gradientMode": "none",
+						"hideFrom": {
+							"legend": false,
+							"tooltip": false,
+							"viz": false
+						},
+						"insertNulls": false,
+						"lineInterpolation": "linear",
+						"lineWidth": 2,
+						"pointSize": 4,
+						"scaleDistribution": {
+							"type": "linear"
+						},
+						"showPoints": "never",
+						"spanNulls": false,
+						"stacking": {
+							"group": "A",
+							"mode": "none"
+						},
+						"thresholdsStyle": {
+							"mode": "off"
+						}
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							}
+						]
+					},
+					"unit": "s"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 9,
+				"w": 12,
+				"x": 12,
+				"y": 8
+			},
+			"id": 6,
+			"options": {
+				"legend": {
+					"calcs": [],
+					"displayMode": "list",
+					"placement": "bottom",
+					"showLegend": true
+				},
+				"tooltip": {
+					"hideZeros": false,
+					"mode": "multi",
+					"sort": "none"
+				}
+			},
+			"pluginVersion": "12.1.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "prometheus"
+					},
+					"editorMode": "code",
+					"expr": "histogram_quantile(0.95, sum by (le, route) (rate(ecommerce_backend_http_request_duration_seconds_bucket{method=~\"$method\",route=~\"$route\",status=~\"$status\"}[5m])))",
+					"instant": false,
+					"legendFormat": "{{route}}",
+					"range": true,
+					"refId": "A"
+				}
+			],
+			"title": "P95 Latency by Route",
+			"type": "timeseries"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "prometheus"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "palette-classic"
+					},
+					"custom": {
+						"align": "auto",
+						"cellOptions": {
+							"type": "auto"
+						},
+						"inspect": false
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							}
+						]
+					}
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 11,
+				"w": 12,
+				"x": 0,
+				"y": 17
+			},
+			"id": 7,
+			"options": {
+				"cellHeight": "sm",
+				"footer": {
+					"countRows": false,
+					"fields": "",
+					"reducer": ["sum"],
+					"show": false
+				},
+				"showHeader": true
+			},
+			"pluginVersion": "12.1.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "prometheus"
+					},
+					"editorMode": "code",
+					"expr": "sum by (route, method, status) (rate(ecommerce_backend_http_requests_total{method=~\"$method\",route=~\"$route\",status=~\"$status\"}[5m]))",
+					"format": "table",
+					"instant": true,
+					"range": false,
+					"refId": "A"
+				}
+			],
+			"title": "Route Drilldown",
+			"transformations": [
+				{
+					"id": "labelsToFields",
+					"options": {
+						"mode": "columns"
+					}
+				},
+				{
+					"id": "organize",
+					"options": {
+						"excludeByName": {
+							"Time": true
+						},
+						"indexByName": {
+							"Value": 3,
+							"method": 1,
+							"route": 0,
+							"status": 2
+						},
+						"renameByName": {
+							"Value": "rps"
+						}
+					}
+				}
+			],
+			"type": "table"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "prometheus"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "palette-classic"
+					},
+					"custom": {
+						"align": "auto",
+						"cellOptions": {
+							"type": "auto"
+						},
+						"inspect": false
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							}
+						]
+					},
+					"unit": "s"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 11,
+				"w": 12,
+				"x": 12,
+				"y": 17
+			},
+			"id": 8,
+			"options": {
+				"cellHeight": "sm",
+				"footer": {
+					"countRows": false,
+					"fields": "",
+					"reducer": ["sum"],
+					"show": false
+				},
+				"showHeader": true
+			},
+			"pluginVersion": "12.1.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "prometheus"
+					},
+					"editorMode": "code",
+					"expr": "histogram_quantile(0.95, sum by (le, route, method, status) (rate(ecommerce_backend_http_request_duration_seconds_bucket{method=~\"$method\",route=~\"$route\",status=~\"$status\"}[5m])))",
+					"format": "table",
+					"instant": true,
+					"range": false,
+					"refId": "A"
+				}
+			],
+			"title": "Latency Drilldown",
+			"transformations": [
+				{
+					"id": "labelsToFields",
+					"options": {
+						"mode": "columns"
+					}
+				},
+				{
+					"id": "organize",
+					"options": {
+						"excludeByName": {
+							"Time": true
+						},
+						"indexByName": {
+							"Value": 3,
+							"method": 1,
+							"route": 0,
+							"status": 2
+						},
+						"renameByName": {
+							"Value": "p95_seconds"
+						}
+					}
+				}
+			],
+			"type": "table"
+		}
+	],
+	"refresh": "30s",
+	"schemaVersion": 41,
+	"tags": ["prometheus", "api", "http"],
+	"templating": {
+		"list": [
+			{
+				"current": {
+					"selected": true,
+					"text": "All",
+					"value": ".*"
+				},
+				"datasource": {
+					"type": "prometheus",
+					"uid": "prometheus"
+				},
+				"definition": "label_values(ecommerce_backend_http_requests_total, method)",
+				"hide": 0,
+				"includeAll": true,
+				"label": "Method",
+				"multi": true,
+				"name": "method",
+				"options": [],
+				"query": {
+					"query": "label_values(ecommerce_backend_http_requests_total, method)",
+					"refId": "Prometheus-method-Variable-Query"
+				},
+				"refresh": 1,
+				"regex": "",
+				"skipUrlSync": false,
+				"sort": 1,
+				"type": "query"
+			},
+			{
+				"current": {
+					"selected": true,
+					"text": "All",
+					"value": ".*"
+				},
+				"datasource": {
+					"type": "prometheus",
+					"uid": "prometheus"
+				},
+				"definition": "label_values(ecommerce_backend_http_requests_total{method=~\"$method\"}, route)",
+				"hide": 0,
+				"includeAll": true,
+				"label": "Route",
+				"multi": true,
+				"name": "route",
+				"options": [],
+				"query": {
+					"query": "label_values(ecommerce_backend_http_requests_total{method=~\"$method\"}, route)",
+					"refId": "Prometheus-route-Variable-Query"
+				},
+				"refresh": 1,
+				"regex": "",
+				"skipUrlSync": false,
+				"sort": 1,
+				"type": "query"
+			},
+			{
+				"current": {
+					"selected": true,
+					"text": "All",
+					"value": ".*"
+				},
+				"datasource": {
+					"type": "prometheus",
+					"uid": "prometheus"
+				},
+				"definition": "label_values(ecommerce_backend_http_requests_total{method=~\"$method\",route=~\"$route\"}, status)",
+				"hide": 0,
+				"includeAll": true,
+				"label": "Status",
+				"multi": true,
+				"name": "status",
+				"options": [],
+				"query": {
+					"query": "label_values(ecommerce_backend_http_requests_total{method=~\"$method\",route=~\"$route\"}, status)",
+					"refId": "Prometheus-status-Variable-Query"
+				},
+				"refresh": 1,
+				"regex": "",
+				"skipUrlSync": false,
+				"sort": 1,
+				"type": "query"
+			}
+		]
+	},
+	"time": {
+		"from": "now-6h",
+		"to": "now"
+	},
+	"timepicker": {},
+	"timezone": "",
+	"title": "Ecommerce Backend Overview",
+	"uid": "ecommerce-backend-overview",
+	"version": 1,
+	"weekStart": ""
+}

@@ -7,6 +7,7 @@ import { PrismaDatabase } from "./database/database";
 import { log, setupDocs, showRoutes } from "./lib/dev";
 import { setupAbandonedCartScheduler, setupEmailWorker, setupPromotionScheduler } from "./lib/email";
 import environment from "./lib/environment";
+import { printMetrics, registerMetrics } from "./lib/metrics";
 import redis from "./lib/redis";
 import storage from "./lib/storage";
 import cors from "./middlewares/cors";
@@ -21,7 +22,9 @@ if (environment.ENV === "DEV") {
 	server.use(requestLogger);
 }
 
+server.use("*", registerMetrics);
 server.use(secureHeaders());
+server.get("/metrics", printMetrics);
 server.use(cors);
 server.use(database);
 server.use(

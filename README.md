@@ -28,6 +28,10 @@ API REST completa para uma aplicação de ecommerce, desenvolvida com **Bun** e 
 - **S3:** upload e download com URLs pré-assinadas (simulado com LocalStack em dev).
 - **Filas e Email:** processamento assíncrono com BullMQ + Nodemailer.
 - **Documentação:** OpenAPI 3.0 gerada automaticamente com Scalar UI em `/docs`.
+- **Métricas:** endpoint Prometheus disponível em `/metrics`.
+- **Monitoramento local:** Prometheus disponível em `http://localhost:9090`.
+- **Visualização local:** Grafana disponível em `http://localhost:3001` com datasource Prometheus provisionado automaticamente.
+- **Dashboard inicial:** overview HTTP com filtros por método, rota e status já provisionado no Grafana.
 
 ---
 
@@ -107,7 +111,7 @@ Além de 5 categorias, 4 produtos com imagens e opções selecionáveis, e um en
 bun dev
 ```
 
-API disponível em `http://localhost:8080` · Documentação em `http://localhost:8080/docs`
+API disponível em `http://localhost:8080` · Documentação em `http://localhost:8080/docs` · Métricas em `http://localhost:8080/metrics`
 
 ---
 

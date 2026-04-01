@@ -44,7 +44,34 @@ services:
     environment:
       MP_MAX_MESSAGES: 5000
 
+  prometheus:
+    image: prom/prometheus:v3.4.2
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana:12.1.1
+    restart: always
+    depends_on:
+      - prometheus
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - "./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro"
+      - "./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro"
+      - "./grafana/dashboards:/etc/grafana/provisioning/dashboards-json:ro"
+      - grafana_data:/var/lib/grafana
+
 volumes:
   localstack_data:
   pgdata:
   redis_data:
+  grafana_data:
