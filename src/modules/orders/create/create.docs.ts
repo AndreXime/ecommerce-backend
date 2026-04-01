@@ -8,7 +8,8 @@ export const OrderCreateRoute = createRoute({
 	path: "/",
 	tags: ["Orders"],
 	summary: "Criar pedido",
-	description: "Cria pedido a partir do carrinho ativo ou de itens explícitos.",
+	description:
+		"Cria pedido a partir do carrinho ativo ou de itens explícitos com validação de variante, snapshot de preço e reserva transacional de estoque.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {
@@ -20,6 +21,7 @@ export const OrderCreateRoute = createRoute({
 			content: { "application/json": { schema: OrderSchema } },
 		},
 		400: { description: "Carrinho vazio" },
+		409: { description: "Estoque insuficiente para concluir o pedido" },
 		401: { description: "Não autenticado" },
 	},
 });

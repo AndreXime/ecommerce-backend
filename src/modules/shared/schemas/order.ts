@@ -7,13 +7,16 @@ export const OrderItemSchema = z.object({
 	img: z.string().nullable().optional(),
 	quantity: z.number().int(),
 	price: z.number(),
+	unitPrice: z.number(),
+	discountPercentage: z.number().nullable().optional(),
+	subtotal: z.number(),
 });
 
 export const OrderSchema = z.object({
 	id: z.string().uuid(),
 	date: z.iso.datetime(),
 	total: z.number(),
-	status: z.enum(["delivered", "intransit", "cancelled"]),
+	status: z.enum(["pending", "intransit", "delivered", "cancelled"]),
 	items: z.array(OrderItemSchema),
 });
 

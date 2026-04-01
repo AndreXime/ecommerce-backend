@@ -6,11 +6,13 @@ import type { ProductCreateBodySchema } from "./create.schema";
 type Body = z.infer<typeof ProductCreateBodySchema>;
 
 export async function createProduct(body: Body) {
-	const { options, specs, ...data } = body;
+	const { options, specs, stockQuantity, ...data } = body;
 
 	const product = await database.product.create({
 		data: {
 			...data,
+			stockQuantity,
+			inStock: stockQuantity > 0,
 			// Cast necessário: Prisma representa Json como Record<string, unknown> internamente
 			specs: (specs ?? {}) as Record<string, string>,
 			options: options ? { create: options } : undefined,

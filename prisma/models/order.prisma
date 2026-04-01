@@ -1,4 +1,5 @@
 enum OrderStatus {
+  pending
   delivered
   intransit
   cancelled
@@ -7,7 +8,7 @@ enum OrderStatus {
 model Order {
   id     String      @id @default(uuid(7)) @db.Uuid
   total  Decimal     @db.Decimal(10, 2)
-  status OrderStatus @default(intransit)
+  status OrderStatus @default(pending)
 
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -21,12 +22,14 @@ model Order {
 }
 
 model OrderItem {
-  id      String  @id @default(uuid(7)) @db.Uuid
-  name    String
-  variant String?
-  img     String?
-  quantity Int    @default(1)
-  price   Decimal @db.Decimal(10, 2)
+  id                 String   @id @default(uuid(7)) @db.Uuid
+  name               String
+  variant            String?
+  img                String?
+  quantity           Int      @default(1)
+  unitPrice          Decimal  @map("unit_price") @db.Decimal(10, 2)
+  discountPercentage Decimal? @map("discount_percentage") @db.Decimal(5, 2)
+  subtotal           Decimal  @db.Decimal(10, 2)
 
   orderId String @db.Uuid
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)

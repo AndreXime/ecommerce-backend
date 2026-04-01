@@ -8,7 +8,8 @@ export const OrderUpdateStatusRoute = createRoute({
 	path: "/:id/status",
 	tags: ["Orders"],
 	summary: "Atualizar status do pedido",
-	description: "Atualiza o status de um pedido. Operação restrita a administradores.",
+	description:
+		"Atualiza o status de um pedido respeitando as transições permitidas. Operação restrita a administradores.",
 	security: [{ Bearer: [] }],
 	middleware: [auth(["ADMIN"])],
 	request: {
@@ -20,6 +21,7 @@ export const OrderUpdateStatusRoute = createRoute({
 			description: "Status atualizado",
 			content: { "application/json": { schema: OrderSchema } },
 		},
+		400: { description: "Transição de status inválida" },
 		401: { description: "Não autenticado" },
 		403: { description: "Acesso negado (Requer ADMIN)" },
 		404: { description: "Pedido não encontrado" },

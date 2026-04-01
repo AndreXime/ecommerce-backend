@@ -20,7 +20,7 @@ export function toProductSummary(p: ProductSummaryPayload) {
 		tag: p.tag,
 		price: Number(p.price),
 		category: p.category.name,
-		discountPercentage: p.discountPercentage ? Number(p.discountPercentage) : null,
+		discountPercentage: p.discountPercentage !== null ? Number(p.discountPercentage) : null,
 		images: p.images.sort((a, b) => a.position - b.position).map((img) => img.url),
 		rating: Number(p.rating),
 		reviewsCount: p.reviewsCount,
@@ -32,6 +32,7 @@ export function toProductSummary(p: ProductSummaryPayload) {
 export function toProductDetails(p: ProductWithRelations) {
 	return {
 		...toProductSummary(p),
+		stockQuantity: p.stockQuantity,
 		quantitySold: p.quantitySold,
 		description: p.description,
 		specs: p.specs as Record<string, string>,

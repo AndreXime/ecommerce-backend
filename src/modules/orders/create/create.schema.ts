@@ -1,5 +1,7 @@
 import { z } from "@hono/zod-openapi";
 
+const SelectedVariantSchema = z.record(z.string(), z.string());
+
 export const OrderCreateBodySchema = z.object({
 	// Cria o pedido a partir do carrinho atual do usuário.
 	// Itens opcionais para sobrescrever o carrinho (ex: compra direta).
@@ -8,8 +10,9 @@ export const OrderCreateBodySchema = z.object({
 			z.object({
 				productId: z.string().uuid(),
 				quantity: z.number().int().min(1),
-				selectedVariant: z.record(z.string(), z.string()).optional(),
+				selectedVariant: SelectedVariantSchema.optional(),
 			}),
 		)
+		.min(1)
 		.optional(),
 });

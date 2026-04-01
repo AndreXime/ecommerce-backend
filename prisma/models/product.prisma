@@ -15,7 +15,8 @@ model Product {
   rating             Decimal  @default(0) @db.Decimal(3, 2)
   reviewsCount       Int      @default(0)
   isNew              Boolean  @default(false)
-  inStock            Boolean  @default(true)
+  inStock            Boolean  @default(false)
+  stockQuantity      Int      @default(0) @map("stock_quantity")
   quantitySold       Int      @default(0)
   description        String
   specs              Json     @default("{}")
@@ -80,5 +81,6 @@ model Review {
   userId String? @db.Uuid
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
+  @@unique([productId, userId])
   @@map("reviews")
 }

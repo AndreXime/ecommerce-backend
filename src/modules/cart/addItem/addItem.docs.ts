@@ -20,6 +20,8 @@ export const CartAddItemRoute = createRoute({
 			description: "Carrinho atualizado",
 			content: { "application/json": { schema: CartSchema } },
 		},
+		400: { description: "Variante inválida para o produto" },
 		401: { description: "Não autenticado" },
+		404: { description: "Produto não encontrado" },
 	},
 });

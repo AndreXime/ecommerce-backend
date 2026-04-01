@@ -1,5 +1,7 @@
 import type { z } from "@hono/zod-openapi";
+import { HTTPException } from "hono/http-exception";
 import { database } from "@/database/database";
+import { validateSelectedVariant } from "@/modules/shared/utils/variantValidation";
 import { getCart } from "../get/get.service";
 import { buildVariantSignature, normalizeSelectedVariant } from "../shared/variantSignature";
 import type { CartAddItemBodySchema } from "./addItem.schema";
@@ -7,12 +9,34 @@ import type { CartAddItemBodySchema } from "./addItem.schema";
 type Body = z.infer<typeof CartAddItemBodySchema>;
 
 export async function addCartItem(userId: string, body: Body) {
+	const product = await database.product.findUnique({
+		where: { id: body.productId },
+		select: {
+			id: true,
+			name: true,
+			options: {
+				select: {
+					label: true,
+					values: true,
+				},
+				orderBy: { label: "asc" },
+			},
+		},
+	});
+
+	if (!product) {
+		throw new HTTPException(404, {
+			message: `Produto "${body.productId}" não encontrado.`,
+		});
+	}
+
+	const selectedVariant = validateSelectedVariant(body.selectedVariant, product.options, product.name);
 	const cart = await database.cart.upsert({
 		where: { userId },
 		create: { userId },
 		update: {},
 	});
-	const variantSignature = buildVariantSignature(body.selectedVariant);
+	const variantSignature = buildVariantSignature(selectedVariant);
 
 	const existing = await database.cartItem.findUnique({
 		where: {
@@ -35,7 +59,7 @@ export async function addCartItem(userId: string, body: Body) {
 						cartId: cart.id,
 						productId: body.productId,
 						quantity: body.quantity,
-						selectedVariant: normalizeSelectedVariant(body.selectedVariant),
+						selectedVariant: normalizeSelectedVariant(selectedVariant),
 						variantSignature,
 					},
 				}),

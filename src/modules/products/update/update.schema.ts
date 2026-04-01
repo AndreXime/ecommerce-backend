@@ -10,7 +10,7 @@ export const ProductUpdateBodySchema = z.object({
 	price: z.number().positive().optional(),
 	discountPercentage: z.number().min(0).max(100).nullable().optional(),
 	isNew: z.boolean().optional(),
-	inStock: z.boolean().optional(),
+	stockQuantity: z.number().int().min(0).optional(),
 	description: z.string().min(10).optional(),
 	specs: z.record(z.string(), z.string()).optional(),
 	categoryId: z.string().uuid().optional(),
