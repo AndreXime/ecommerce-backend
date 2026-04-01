@@ -2,30 +2,8 @@
 
 ## Prioridade Alta
 
-- Implementar controle de estoque real no fechamento do pedido.
-  - Porque: sem controle quantitativo no momento da compra, dois pedidos podem consumir o mesmo estoque.
-  - Como resolver: validar e decrementar estoque dentro da mesma transação de criação do pedido.
-- Validar quantidade disponível antes de criar o pedido.
-- Baixar estoque de forma transacional para evitar oversell.
-- Congelar o preço final do item no momento da compra.
-  - Porque: o histórico do pedido não pode mudar quando o preço do produto for alterado depois.
-  - Como resolver: persistir `unitPrice`, desconto aplicado e subtotal no item do pedido.
-- Garantir que descontos aplicados no pedido não dependam do preço atual do produto.
-- Validar se a variante enviada no carrinho existe nas opções do produto.
-  - Porque: hoje é possível receber uma combinação arbitrária de chave/valor sem garantir que ela pertence ao catálogo.
-  - Como resolver: comparar a variante enviada com as `options` e `values` cadastradas no produto antes de salvar.
-- Impedir combinações de variantes inválidas.
-- Definir transições válidas para status de pedido.
-  - Porque: sem uma máquina de estados, o pedido pode pular entre estados incoerentes, como voltar de `delivered` para `intransit`.
-  - Como resolver: criar uma tabela clara de transições permitidas e validar toda mudança de status contra ela.
-- Impedir cancelamento ou edição de pedido fora dos estados permitidos.
-
 ## Prioridade Média
 
-- Restringir review para usuários que realmente compraram o produto.
-  - Porque: review sem compra reduz confiança e distorce rating.
-  - Como resolver: exigir pelo menos um pedido elegível do usuário contendo o produto antes de aceitar a avaliação.
-- Impedir múltiplas reviews indevidas para o mesmo produto no mesmo contexto de compra.
 - Definir regra de quando um produto pode ou não ser removido.
   - Porque: remover produto com histórico pode quebrar rastreabilidade e relatórios.
   - Como resolver: definir se o produto será arquivado, ocultado ou removido fisicamente dependendo do vínculo com pedidos.
@@ -66,27 +44,16 @@
 
 ### Products
 
-- Validar variantes contra opções cadastradas.
 - Definir política de remoção e arquivamento de produtos.
 - Definir política de remoção de categorias com produtos vinculados.
 
 ### Cart
 
-- Validar variantes antes de persistir item.
 - Validar estoque disponível já na adição/atualização, se desejado.
 
 ### Orders
 
-- Implementar baixa de estoque no fechamento.
-- Persistir preço final por item de forma imutável.
-- Definir máquina de estados do pedido.
-- Definir regras de cancelamento.
-  - Observação: esses quatro pontos são interdependentes. O ideal é tratar o fechamento do pedido como um fluxo transacional único, com validação de estoque, cálculo final, criação dos itens e definição do estado inicial.
-
 ### Reviews
-
-- Permitir avaliação apenas para compradores elegíveis.
-- Definir limite de avaliações por produto/pedido/usuário.
 
 ### Promotions
 
