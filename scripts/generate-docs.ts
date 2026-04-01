@@ -37,7 +37,7 @@ const openApiDocument = app.getOpenAPI31Document({
 		version: "1.0.0",
 		title: "API Ecommerce",
 		description:
-			"Documentação automática via Hono OpenAPI para visualização estática. Este HTML não suporta interação.",
+			"Documentação automática via Hono OpenAPI em modo readonly. Por isso, os botões de teste de requisição não funcionam.",
 	},
 	servers: [
 		{
