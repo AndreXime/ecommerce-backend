@@ -8,7 +8,7 @@ export const AddReviewRoute = createRoute({
 	tags: ["Products"],
 	summary: "Avaliar produto",
 	description:
-		"Adiciona uma avaliação ao produto em nome do usuário autenticado. O rating médio e a contagem de avaliações do produto são recalculados automaticamente.",
+		"Adiciona uma avaliação ao produto em nome do usuário autenticado. Apenas clientes com pedido entregue contendo o produto podem avaliar, com limite de uma review por usuário em cada produto. O rating médio e a contagem de avaliações do produto são recalculados automaticamente.",
 	security: [{ Bearer: [] }],
 	middleware: [auth([])],
 	request: {
@@ -20,6 +20,8 @@ export const AddReviewRoute = createRoute({
 			description: "Avaliação adicionada",
 			content: { "application/json": { schema: AddReviewResponseSchema } },
 		},
+		403: { description: "Usuário não possui compra elegível entregue para este produto" },
+		409: { description: "Usuário já avaliou este produto" },
 		401: { description: "Não autenticado" },
 		404: { description: "Produto não encontrado" },
 	},
